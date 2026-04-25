@@ -25,6 +25,15 @@
         "file": "jds/openjd-contributor.openthing",
         "added": "2026-04-25",
         "decision": "decisions/jd-openjd-contributor.md"
+      },
+      {
+        "id": "openjd-validator",
+        "name": "openjd Validator",
+        "version": "1.0.0",
+        "description": "An AI role that validates submitted Job Descriptions against the openjd schema and produces structured Pass/Pass-with-notes/Fail validation reports for posting on PRs.",
+        "file": "jds/openjd-validator.openthing",
+        "added": "2026-04-25",
+        "decision": "decisions/jd-openjd-validator.md"
       }
     ]
   },
@@ -32,7 +41,7 @@
   "metadata": {
     "created": "2026-04-25",
     "schema_version": "0.1.0",
-    "items_count": 1,
+    "items_count": 2,
     "last_updated": "2026-04-25",
     "_comment": "This catalog is the index of all JDs in the canonical library at jds/. As JDs are promoted from proposed-jds/ to jds/, entries are added here. Auto-generation of this index from jds/ contents is a Known Work Item per CLAUDE.md."
   }
