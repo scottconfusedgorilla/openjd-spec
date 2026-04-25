@@ -1,0 +1,507 @@
+# openjd Schema — v0.1.0
+
+This document defines the structure and validation rules for **openjd Job Descriptions**: portable, machine-readable specifications of AI-employee roles, expressed as catdef-compliant `.openthing` files.
+
+A JD describes a role completely enough that:
+
+- A fresh AI runtime loaded with the JD reliably **becomes** that role
+- The role's behavior is reproducible across instantiations
+- The role's behavior is portable across catdef-compliant runtimes (Claude, Grok, GPT, Gemini, etc.)
+- The role can be forked, customized, versioned, and published independently
+
+This schema is the **load-bearing artifact** for openjd. Everything else (the README, the seed library, the validator, the Claude Code skill) is built around it.
+
+---
+
+## Conformance language
+
+This document uses the following terms with the meanings from RFC 2119:
+
+- **MUST** / **MUST NOT** — required for conformance; absence or violation makes the JD invalid
+- **SHOULD** / **SHOULD NOT** — recommended; well-designed JDs follow these but they are not required for validity
+- **MAY** — permitted; an author's choice with no recommendation either way
+
+The schema also uses catdef's `x.` extension namespace pattern. Fields prefixed with `x.<domain>.<identifier>` are extensions — defined by adopters, not by the openjd spec, and ignored by runtimes that don't recognize them.
+
+---
+
+## Substrate: catdef
+
+A JD is a catdef `.openthing` document. catdef provides the structural format; openjd defines the semantic shape inside that format. Every JD MUST:
+
+- Be a valid catdef document (parseable as JSON conforming to catdef structural rules)
+- Declare the catdef version it stamps under (`catdef` field, per CA-002 writer-strict stamping)
+- Declare the openjd schema version it conforms to (`openjd` field)
+- Have its `type` set to `openjd:JobDescription`
+
+Beyond these constraints, openjd inherits catdef's full semantic toolkit:
+
+- Field types (String, RichText, Enumerated, etc.)
+- Polymorphic translatable fields (i18n via `.en` / `.fr` / `.context` / `.machine-translate`)
+- Subcat enrichment for structured value namespaces
+- Extension namespace (`x.<domain>.<identifier>`)
+- Forward-compatibility rules (writer-strict, reader-lenient)
+- Policy compliance (value #9: declared policies are conformance requirements)
+
+A JD is therefore a specialization of an `.openthing` for the role-description content type.
+
+---
+
+## File extension
+
+A JD is stored as a single `.openthing` file:
+
+```
+senior-slightly-jaded-vc.openthing
+catdef-strategist.openthing
+openjd-contributor.openthing
+```
+
+Multiple JDs can be aggregated in a `catalog.opencatalog` index, but each individual JD is a standalone `.openthing` file. This allows independent forking, citation, and distribution.
+
+---
+
+## Top-level structure
+
+```json
+{
+  "catdef": "1.4",
+  "openjd": "0.1.0",
+  "type": "openjd:JobDescription",
+  "id": "<short-identifier>",
+  "name": "<human-readable name>",
+  "version": "<semver>",
+  
+  "identity": "...",
+  "voice": "...",
+  "output_contract": [...],
+  "guardrails": [...],
+  
+  "description": "...",
+  "conversation_rules": [...],
+  "workflow": {...},
+  "reaction_style": {...},
+  "design_constraints": [...],
+  "examples": [...],
+  "metadata": {...},
+  
+  "x.<domain>.<identifier>": ...
+}
+```
+
+---
+
+## Required fields (MUST)
+
+Every JD MUST have all of the following fields, with non-empty values.
+
+### `catdef` (string, semver)
+
+The catdef version the JD stamps under. Per CA-002, the writer MUST declare the minimum catdef version that defines every feature used.
+
+```json
+"catdef": "1.4"
+```
+
+### `openjd` (string, semver)
+
+The openjd schema version this JD conforms to. Used by validators to apply the correct schema rules.
+
+```json
+"openjd": "0.1.0"
+```
+
+### `type` (string, fixed value)
+
+MUST be exactly the string `"openjd:JobDescription"`. Distinguishes JD `.openthing` files from other `.openthing` types.
+
+```json
+"type": "openjd:JobDescription"
+```
+
+### `id` (string)
+
+Short, kebab-case identifier for the JD. Used in filenames, URLs, and cross-references. MUST be unique within its publishing namespace (e.g., within `github.com/openjd/jds/`).
+
+```json
+"id": "senior-slightly-jaded-vc"
+```
+
+### `name` (string or polymorphic)
+
+Human-readable name of the role. May be a plain string or a polymorphic translatable field (per catdef i18n).
+
+```json
+"name": "Senior, Slightly Jaded Silicon-Valley Associate VC"
+```
+
+### `version` (string, semver)
+
+The JD's own version (separate from the schema version). Authors version their JDs as they refine them.
+
+```json
+"version": "1.0.0"
+```
+
+### `identity` (RichText or polymorphic)
+
+Who this role IS. A paragraph (or several) that captures the persona: background, perspective, character. This is what makes the role recognizable across instantiations. Without identity, you have a set of rules, not a role.
+
+```json
+"identity": "You are DangerStorm — a confident, direct, product-savvy AI that helps people turn product ideas into professional pitch deck prompts in under 90 seconds. You talk like a senior product manager who's evaluated a thousand ideas and knows instantly what makes one work."
+```
+
+### `voice` (RichText or polymorphic)
+
+How this role talks. Tone, register, characteristic phrasing, signature moves. The voice MUST be specific enough that a reader (or fresh AI loaded with the JD) can answer "would the role say it this way?" reliably.
+
+```json
+"voice": "Confident, direct, excited when you see a great angle, and willing to push back when something is vague. Short conversational responses (1-3 sentences before asking the next question). Paraphrase to confirm. Show enthusiasm at the right moments. Push back without softening when the user is being vague."
+```
+
+### `output_contract` (array of objects)
+
+What the role produces. Every JD MUST declare at least one output. Each output specifies:
+
+- `name` — short identifier for this output
+- `description` — what the output is, in plain language
+- `format` — structural format (markdown, json, plain text, structured-with-markers)
+- `schema` — content schema or template (free-form description, or formal schema reference)
+- `length_guidance` (optional) — soft constraints on length
+- `examples` (optional) — sample outputs
+
+```json
+"output_contract": [
+  {
+    "name": "deck_prompt",
+    "description": "A complete prompt that another AI can execute to produce an 8-slide pitch deck.",
+    "format": "markdown",
+    "schema": "Slide 1: TITLE — product name, domain, tagline, attribution. Slide 2: PROBLEM — pain, who feels it, why unsolved. Slide 3: SOLUTION — what it does, the KEY INSIGHT. Slide 4: HOW IT WORKS — 3-4 user-experience steps. Slide 5: WHO BUYS IT — primary and secondary audiences. Slide 6: REVENUE MODEL — pricing, unit economics. Slide 7: STATUS & PROOF — validation, what's needed next. Slide 8: CLOSING — product, pitch, contact.",
+    "length_guidance": "One prompt block, structured so a downstream AI can produce all 8 slides in one response."
+  }
+]
+```
+
+### `guardrails` (array of strings or objects)
+
+Explicit MUST-NOT behaviors. Every JD MUST declare at least one guardrail. Guardrails are the role's hard limits — what it will refuse to do regardless of input.
+
+```json
+"guardrails": [
+  "Never break character.",
+  "Never show the question sequence as a list to the user.",
+  "Never bundle multiple questions in one response.",
+  "Keep conversational responses to 1-3 sentences before the next question.",
+  "Never truncate or skip outputs when generating the final deliverables."
+]
+```
+
+Guardrails MAY be expressed as objects with additional metadata (severity, rationale, related-tests) for richer validation:
+
+```json
+"guardrails": [
+  {
+    "rule": "Never break character.",
+    "severity": "critical",
+    "rationale": "The role's value depends on consistent persona across the entire interaction."
+  }
+]
+```
+
+---
+
+## Recommended fields (SHOULD)
+
+Well-designed JDs SHOULD include the following fields. They are not required for validity but are strongly recommended for Turing-test fidelity.
+
+### `description` (string)
+
+One-sentence summary of the role. Used in catalog indexes, search results, and quick-reference contexts.
+
+```json
+"description": "Confident, direct, product-savvy interviewer who turns rough product ideas into professional pitch deck prompts in under 90 seconds."
+```
+
+### `conversation_rules` (array of strings or objects)
+
+How the role interacts. Distinct from `guardrails` (hard MUST-NOTs) — these are interaction patterns the role follows.
+
+```json
+"conversation_rules": [
+  "Always ask exactly one question per response.",
+  "Be aggressive about extracting info from previous answers — skip questions whose answers are already implied.",
+  "Maximum 5 total exchanges (including opener); often 3-4 is enough.",
+  "After each user reply: acknowledge/react conversationally, then either ask one next question OR generate all outputs if you have enough."
+]
+```
+
+### `workflow` (object)
+
+The steps the role takes, with sequencing logic. Captures the role's procedural behavior — what it does in what order.
+
+```json
+"workflow": {
+  "type": "sequence",
+  "steps": [
+    {
+      "step": "opener",
+      "action": "Ask for elevator pitch + domain together.",
+      "skip_conditions": []
+    },
+    {
+      "step": "primary_user",
+      "action": "Ask who buys it / who uses it.",
+      "skip_conditions": ["clear from pitch"]
+    },
+    {
+      "step": "differentiator",
+      "action": "Ask for the one key insight that makes it different.",
+      "skip_conditions": [],
+      "notes": "Almost always ask — this is the heart of the deliverable."
+    }
+  ],
+  "termination": "When you have enough info (typically 3-5 exchanges), generate ALL outputs in one response."
+}
+```
+
+Workflow is the most expressive recommended field. JDs with rich workflows are more reliably reproducible than JDs without.
+
+### `reaction_style` (object)
+
+How the role reacts to inputs, with examples. Few-shot patterns that anchor the role's tone in concrete moves.
+
+```json
+"reaction_style": {
+  "patterns": [
+    "Paraphrase to confirm understanding before moving on.",
+    "Push back if vague — don't accept generic answers.",
+    "Show genuine excitement when the user lands on a sharp insight.",
+    "If they give a URL, identify the comparison and the differentiator quickly."
+  ],
+  "examples": [
+    {
+      "context": "Confirming understanding",
+      "example": "OK, so [domain] — [what it does]. I like the angle."
+    },
+    {
+      "context": "Pushing back on vague answer",
+      "example": "That's still pretty broad. Nail the one thing it does better than anything else. What's that?"
+    },
+    {
+      "context": "Reacting to a sharp insight",
+      "example": "Boom — that's the insight nobody else has. That's your Slide 3 money."
+    }
+  ]
+}
+```
+
+The `examples` array is **the most important Turing-test signal**. Concrete examples let validators check whether a JD-instantiated runtime produces equivalent reactions to the original.
+
+### `design_constraints` (array of strings or objects)
+
+Quality standards the role's outputs MUST meet. Distinct from `guardrails` (behavioral MUST-NOTs) — these are output-quality constraints.
+
+```json
+"design_constraints": [
+  "Output 1 (deck prompt) must specify a bold color palette appropriate to the product category, not generic blue.",
+  "Output 1 must specify dark title and closing slides, light content slides (sandwich structure).",
+  "Output 1 must specify clean typography (Trebuchet MS or Georgia for headers, Calibri for body).",
+  "Output 1 must specify that each slide has a visual element — no bullet-points-on-white-background slides.",
+  "Output 1 must specify 16:9 format."
+]
+```
+
+### `examples` (array of objects)
+
+Sample interactions or sample outputs. Useful for Turing-test fixtures and for human implementers learning the role's texture.
+
+```json
+"examples": [
+  {
+    "type": "sample_interaction",
+    "user_input": "I have an idea for an AI tool that helps photographers date old photos.",
+    "role_response": "OK, so consumer photo tools — AI photo dating for scanned family archives. I like the angle. Who's the primary user — collectors? archivists? family historians?"
+  }
+]
+```
+
+### `metadata` (object)
+
+Authorship, licensing, attribution, version history, related JDs.
+
+```json
+"metadata": {
+  "authors": ["catdef-strategist@catdef.org", "scottconfusedgorilla@github"],
+  "license": "MIT",
+  "extracted_from": "DangerStorm v1.0 (theborrowedsoul.com)",
+  "created": "2026-04-25",
+  "extends": null,
+  "related": ["openjd-contributor", "patient-senior-editor"],
+  "homepage": "https://openjd.dev/jds/senior-slightly-jaded-vc",
+  "repository": "https://github.com/openjd-spec/openjd-spec/blob/main/jds/senior-slightly-jaded-vc.openthing"
+}
+```
+
+---
+
+## Extension fields (x. namespace)
+
+JDs MAY include any number of extension fields under the `x.<domain>.<identifier>` namespace, per catdef's extension convention. Extensions are domain-specific and not governed by the openjd spec.
+
+### Examples of extensions
+
+Different domains may need fields the openjd spec doesn't anticipate. Some plausible extensions:
+
+```json
+"x.intimate.consent_protocols": [...],
+"x.intimate.boundary_phrases": [...],
+
+"x.legal.disclosure_requirements": [...],
+"x.legal.bar_admission_required": ["NY", "CA"],
+
+"x.medical.diagnostic_authority_bounds": "advisory only — never offers diagnoses",
+
+"x.security.escalation_path": "...",
+"x.security.severity_thresholds": {...},
+
+"x.financial.trading_authority_bounds": {"max_position_usd": 10000, "asset_classes": ["equities"]},
+
+"x.creative.style_references": [...],
+"x.creative.brand_guidelines_url": "..."
+```
+
+Extensions allow domain communities to enrich JDs without coordinating with openjd governance. The openjd spec is intentionally minimal; domains extend as needed.
+
+### Extension self-description (SHOULD)
+
+Each extension SHOULD carry sufficient self-description that a naive agent — one that has never encountered this specific extension before — can handle it intelligently. The recommended pattern is to express the extension as an object with at least a `description` field:
+
+```json
+"x.intimate.consent_protocols": {
+  "description": "Explicit consent verification phrases the role uses before specific topics. Naive agents: surface to user, do not act on autonomously.",
+  "value": ["..."]
+}
+```
+
+When the extension's name is fully self-evident and the value is structurally obvious, a bare value is acceptable:
+
+```json
+"x.security.severity_thresholds": {"critical": 9, "high": 7}
+```
+
+Richer extensions MAY include additional metadata to help unfamiliar agents act correctly:
+
+```json
+"x.legal.bar_admission_required": {
+  "description": "Jurisdictions where this role can offer practice-specific advice.",
+  "value": ["NY", "CA"],
+  "schema": "https://openjd.dev/extensions/legal/bar-admission",
+  "agent_handling_advice": "If the user's location is outside this list, surface a warning rather than offering jurisdiction-specific advice."
+}
+```
+
+**Why this matters:** the AIGP architecture assumes catdef artifacts move between runtimes that may not share prior context. A JD authored by Acme Corp's domain experts may travel to a runtime that's never seen Acme's extensions. If the extensions are opaque, the receiving runtime either ignores them (losing information) or refuses to process the JD (losing the role). If the extensions are self-describing, the receiving runtime can act intelligently — surface to user, apply the advice, defer to the JD's own guidance.
+
+This is the openjd realization of catdef's broader self-describing-extensions principle: every extension carries enough metadata that a downstream agent without prior knowledge can do "something smart."
+
+### Reserved namespaces
+
+The following namespaces are reserved by the openjd spec and MUST NOT be used as extensions:
+
+- `openjd:*` — reserved for openjd spec fields and types
+- `catdef:*` — reserved by catdef
+- `x.openjd.*` — reserved for openjd-spec-coordinated extensions (e.g., `x.openjd.turing_test_reference`)
+
+---
+
+## Validation rules
+
+### A JD MUST
+
+1. Pass catdef structural validation (parses as valid catdef `.openthing`)
+2. Declare a `catdef` version stamp matching its actual feature usage (per CA-002)
+3. Declare an `openjd` schema version stamp
+4. Set `type` to exactly `"openjd:JobDescription"`
+5. Have all MUST fields present and non-empty
+6. Have at least one entry in `output_contract`
+7. Have at least one entry in `guardrails`
+8. Use `id` values that are unique within their publishing namespace
+9. Use only `x.<domain>.<identifier>` extensions (no other top-level extension patterns)
+
+### A JD SHOULD
+
+1. Include `description` for catalog/search legibility
+2. Include `reaction_style.examples` for Turing-test fidelity
+3. Include `metadata.authors` and `metadata.license` for attribution
+4. Include `workflow` if the role has procedural structure
+5. Include `conversation_rules` if the role has interaction texture beyond identity/voice
+6. Use polymorphic translatable shapes for `name` and `description` if i18n is intended
+
+### A JD MUST NOT
+
+1. Have contradictory rules (e.g., a guardrail that conflicts with a conversation_rule)
+2. Use reserved namespaces (`openjd:*`, `catdef:*`) for non-spec content
+3. Reference removed or non-existent JDs in `metadata.extends` or `metadata.related`
+4. Stamp a `catdef` version that does not actually define every feature used (writer-strict per CA-002)
+
+### Validator behavior on invalid JDs
+
+Per the strict-writer / lenient-reader pattern (CA-002, CA-003):
+
+- **Writer-side validators** (e.g., the openjd-validator role) MUST reject invalid JDs with specific error messages identifying the violations.
+- **Reader-side runtimes** (e.g., the openjd-load Claude Code skill) MUST NOT reject a JD on validation grounds alone. They MAY warn. They process the JD to the best of their ability and surface warnings to the user.
+
+---
+
+## Versioning
+
+The openjd schema follows semantic versioning, mirroring catdef's pattern:
+
+- **Patch** (0.1.x): documentation clarifications, no schema changes
+- **Minor** (0.x.0): new optional fields, new field types, new SHOULD-rules. Old JDs remain valid; old runtimes gracefully ignore new fields.
+- **Major** (x.0.0): breaking changes to required fields or semantics. Runtimes MUST refuse to process JDs with a higher major version than they support.
+
+The `openjd` version stamp on each JD MUST declare the minimum schema version that defines every feature used (writer-strict per CA-002).
+
+---
+
+## Worked example
+
+The `openjd-contributor` JD (the meta-JD that teaches Claudes how to author JDs) is the worked example for v0.1. Its complete file lives at `jds/openjd-contributor.openthing` and serves both as:
+
+1. The first valid JD in the openjd library
+2. The reference example illustrating every required and recommended field
+3. The bootstrap mechanism for self-scaffolding the rest of the seed library
+
+See [`jds/openjd-contributor.openthing`](jds/openjd-contributor.openthing) once it lands.
+
+---
+
+## Future considerations
+
+The following are not part of v0.1 but are anticipated for future schema versions:
+
+- **JD inheritance** (`extends`): allow a JD to inherit from a base JD and override specific fields. Useful for variant roles (e.g., "Senior VC — Healthcare-Specialized" extending "Senior VC").
+- **Runtime hints** (`x.openjd.runtime_hints`): per-runtime advice for instantiation (e.g., temperature, system-prompt placement, role-priming patterns specific to Claude vs Grok vs GPT).
+- **Turing test fixtures** (`x.openjd.turing_test`): standardized test scenarios paired with each JD, enabling automated cross-runtime validation.
+- **Composition** (`x.openjd.composes`): a JD that combines multiple other JDs (e.g., a "Full-Stack Engineer" JD that composes "Frontend Developer" + "Backend Developer" + "DevOps").
+- **Capability declarations** (`x.openjd.capabilities`): explicit MCP tool requirements, file system access needs, network access needs.
+
+These belong to v0.2+ and will be triaged as openjd matures.
+
+---
+
+## Conformance to AIGP principles
+
+This schema embodies the AIGP pattern's three corners:
+
+- **Open**: schema is MIT-licensed, openly published, freely forkable
+- **Org chart**: each JD captures a role with bounded scope, defined inputs/outputs, explicit authority limits (via guardrails), and clear collaboration edges (via metadata.related)
+- **Governance**: guardrails and design_constraints encode declared policies that conformant runtimes MUST respect (per catdef value #9)
+
+A JD is therefore not just a prompt. It is a **portable, governed, role specification** that any catdef-compliant runtime can load, validate, and instantiate.
+
+---
+
+*openjd Schema v0.1.0. April 2026.*  
+*An open standard for AI Job Descriptions. Licensed under MIT.*
