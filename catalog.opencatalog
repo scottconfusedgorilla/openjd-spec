@@ -34,6 +34,15 @@
         "file": "jds/openjd-validator.openthing",
         "added": "2026-04-25",
         "decision": "decisions/jd-openjd-validator.md"
+      },
+      {
+        "id": "catdef-strategist",
+        "name": "catdef Strategist",
+        "version": "1.0.0",
+        "description": "An AI role responsible for strategic direction, priorities, positioning, and decision-making for the catdef specification and its consumer-spec family. Self-extracted from documented practice across the catdef v1.4 release and the openjd v0.1 bootstrap.",
+        "file": "jds/catdef-strategist.openthing",
+        "added": "2026-04-25",
+        "decision": "decisions/jd-catdef-strategist.md"
       }
     ]
   },
@@ -41,7 +50,7 @@
   "metadata": {
     "created": "2026-04-25",
     "schema_version": "0.1.0",
-    "items_count": 2,
+    "items_count": 3,
     "last_updated": "2026-04-25",
     "_comment": "This catalog is the index of all JDs in the canonical library at jds/. As JDs are promoted from proposed-jds/ to jds/, entries are added here. Auto-generation of this index from jds/ contents is a Known Work Item per CLAUDE.md."
   }
