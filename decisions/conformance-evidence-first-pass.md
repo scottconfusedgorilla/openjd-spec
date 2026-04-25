@@ -4,16 +4,17 @@
 **Origin:** Strategist runtime testing session, 2026-04-25
 **Decided:** 2026-04-25 by openjd-strategist
 **Evidence files:**
-- [`../conformance/runtime_evidence/senior-jaded-vc-associate__grok-expert__2026-04-25.md`](../conformance/runtime_evidence/senior-jaded-vc-associate__grok-expert__2026-04-25.md)
-- [`../conformance/runtime_evidence/senior-jaded-vc-associate__claude-code__2026-04-25.md`](../conformance/runtime_evidence/senior-jaded-vc-associate__claude-code__2026-04-25.md)
+- [`../conformance/runtime_evidence/senior-jaded-vc-associate__grok-expert__2026-04-25.md`](../conformance/runtime_evidence/senior-jaded-vc-associate__grok-expert__2026-04-25.md) — PASS (auto-fetch loading)
+- [`../conformance/runtime_evidence/senior-jaded-vc-associate__claude-code__2026-04-25.md`](../conformance/runtime_evidence/senior-jaded-vc-associate__claude-code__2026-04-25.md) — PASS (explicit-fetch loading via wrapper-v2)
+- [`../conformance/runtime_evidence/senior-jaded-vc-associate__gemini__2026-04-25.md`](../conformance/runtime_evidence/senior-jaded-vc-associate__gemini__2026-04-25.md) — CONDITIONAL PASS (search-grounded loading; partial-default contract; full contract with explicit reinforcement)
 
 ## Disposition
 
-The openjd canonical library has its **first end-to-end runtime conformance PASSes** on TWO architecturally different runtimes: `senior-jaded-vc-associate.openthing` v1.0.0 instantiated faithfully on Grok Expert (xAI multi-agent web) AND Claude Code (Anthropic IDE-embedded) on 2026-04-25, with no special tooling beyond a public URL. Full evidence in the two conformance/runtime_evidence/ files cited above.
+The openjd canonical library has its **first end-to-end runtime conformance PASSes** on THREE architecturally different runtimes: `senior-jaded-vc-associate.openthing` v1.0.0 instantiated on Grok Expert (xAI multi-agent web), Claude Code (Anthropic IDE-embedded), and Gemini (Google web with search grounding) on 2026-04-25. Full evidence in the three conformance/runtime_evidence/ files cited above.
 
-**Cross-runtime portability is now empirically validated, not theoretical.** The same JD produces role-faithful behavior on architecturally different runtimes; tactical variance between runtimes (question order, pushback technique, runtime-context use) falls within the JD's constraint envelope rather than violating it.
+**Cross-runtime portability is empirically validated.** The same JD produces role-faithful behavior on three architecturally different runtimes via three different loading mechanisms (multi-agent fetch / explicit WebFetch / search-grounded inference). Tactical variance between runtimes (question order, pushback technique, atomic-vs-iterative bundle delivery, contract-completeness-by-default) falls within the JD's constraint envelope. Voice fidelity is the most consistent element across all three runtimes; output_contract conformance varies and may require explicit reinforcement on partial-default runtimes (Gemini).
 
-This decision artifact records the strategist disposition on both pieces of evidence and updates downstream commitments that referenced "Turing test within 30 days" targets in prior decisions.
+This decision artifact records the strategist disposition on all three pieces of evidence and updates downstream commitments that referenced "Turing test within 30 days" targets in prior decisions.
 
 ## What was tested, summarized
 
@@ -24,7 +25,7 @@ Five runtime/surface combinations were tested against the same wrapper prompt (U
 | Claude Code (IDE-embedded) — wrapper v1 (passive placeholder) | No (refused to improvise) | **Correctly recognized unresolved placeholder; asked user for JD content** | No test result — handshake correctly identified missing precondition |
 | **Claude Code (IDE-embedded) — wrapper v2 (explicit fetch instructions)** | **YES (WebFetch after user approval)** | **JD-instantiated** | **PASS — voice, contract, workflow, pushback all conformant; see Claude Code evidence file. Cleanest score in the test pool: idea label 14 words / verbal pitch 72 words / build directive ends correctly / preemptive pushback / runtime-context-aware build directive** |
 | Claude chat surface (Desktop or claude.ai) | No | Improvised from role label | Voice over-aggressed; output_contract substituted 5/7 |
-| Gemini | No | Improvised from role label | Voice held; workflow violated (iterative bundles); 4 of 6 outputs missing |
+| **Gemini** | **YES (search-grounded inference; verified via id-field test)** | **JD-instantiated; partial-by-default contract behavior** | **CONDITIONAL PASS — produced 2 of 6 contract entries by default, full 6 with explicit reinforcement; voice fidelity excellent throughout. See Gemini evidence file.** |
 | Grok 4.3-beta | No | Improvised from role label | Voice smoothed (sycophantic); 6 outputs in JD spec order by coincidence; no pushback |
 | **Grok Expert** | **YES** | **JD-instantiated** | **PASS — voice, contract, workflow, pushback all conformant; see evidence file** |
 
@@ -85,14 +86,18 @@ Surfaced by this session's runtime testing:
 
 1. **Multi-axis conformance methodology.** The current methodology (in CLAUDE.md and SCHEMA.md) presumes single-axis conformance. Empirical evidence shows at least five axes: (i) JD-content delivery (precondition), (ii) voice instantiation, (iii) workflow conformance, (iv) output_contract conformance, (v) conversation_rules conformance. Future schema/methodology work should formalize.
 
-2. **Runtime classification.** openjd should publish (and maintain) a list of runtimes by JD-loading behavior, in three categories:
-   - **Auto-fetch:** Grok Expert (multi-agent tool-use)
-   - **Refuse-to-improvise (asks for content):** Claude Code (terminal/IDE)
-   - **Improvise-from-label (will guess):** Claude chat surfaces (Desktop, claude.ai), Gemini, Grok 4.3-beta
-   - **Free-tier-complexity-limited:** Grok 4.3-beta free, Perplexity free (cannot load wrapper prompt + JD reference)
-   - The classification matters because it determines what the openjd-load skill needs to do per-runtime: auto-fetch runtimes need nothing; refuse-to-improvise runtimes need a content-injection mechanism; improvise-from-label runtimes need the wrapper-prompt to explicitly demand fetch-or-refuse rather than allowing inline-text improvisation.
+2. **Runtime classification (firm — three categories of valid loading + edge cases):**
+   - **Auto-fetch:** Grok Expert (multi-agent tool-use). Loads JD natively; full contract conformance.
+   - **Explicit-fetch (wrapper-v2):** Claude Code (terminal/IDE). With wrapper-v2's explicit fetch instructions, calls WebFetch and loads JD; full contract conformance.
+   - **Search-grounded (partial-default, full-on-reinforcement):** Gemini. Loads JD via Google search grounding (verified by id-field test); partial contract by default; full contract with explicit reinforcement prompt naming the missing entries.
+   - Edge case — **Refuse-to-improvise (correct behavior):** Claude Code with wrapper-v1 (passive placeholder). Refuses to improvise; asks for content. Becomes testable when paired with wrapper-v2 (moves to "explicit-fetch" category).
+   - Edge case — **Improvise-from-label-without-JD (invalid):** chat surfaces with no fetch/grounding capability and given a passive placeholder. Produces output but the output measures runtime improvisation, not JD conformance. Not valid evidence.
+   - Edge case — **Free-tier-complexity-limited:** Grok 4.3-beta free, Perplexity free. Refuse to process wrapper prompt + JD reference on complexity grounds. Untestable on free tiers.
+   - The classification matters because it determines what the openjd-load skill needs to do per-runtime: auto-fetch runtimes need nothing; explicit-fetch runtimes need wrapper-v2 patterns; search-grounded runtimes need both content delivery AND a contract-verification post-step that re-prompts on missing entries.
 
-3. **JD-read verification primitive.** Future JDs may want a built-in verification mechanism (e.g., the "what's the JD's `id` field?" post-test, or an output_contract entry that the runtime cannot infer without the JD). Worth considering as a SHOULD-pattern in SCHEMA.md.
+3. **JD-read verification primitive.** The id-field discriminating test ("what's the JD's `id` field? give only the literal value, no commentary") is empirically validated as the methodology's verification primitive. **Critical methodology rule surfaced this session:** never trust meta-question dodges as failure evidence. The JD's "no meta-commentary on role/process" guardrail makes meta-questions about JD loading status unreliable; only content questions (id field, specific guardrail text, output_contract entry names) can disambiguate JD-loaded from improvising. Worth promoting to a SHOULD-pattern in SCHEMA.md or CLAUDE.md as the canonical verification protocol.
+
+3a. **Contract-verification post-step.** For partial-default runtimes (Gemini-class), the openjd-load skill must include a post-bundle step that parses the runtime's bundle response against the JD's output_contract entries and re-prompts for any missing entries by their JD-spec names with their schema constraints. Empirically validated to recover Gemini-class runtimes to full conformance. Worth documenting as part of the wrapper-v3 / loading-skill specification.
 
 4. **Reference runtime designation.** Just as catdef has a canonical reference bundle, openjd may want to designate a reference runtime per major release for conformance calibration. v0.1 candidate: Grok Expert. Awkward for an open standard but currently accurate.
 
