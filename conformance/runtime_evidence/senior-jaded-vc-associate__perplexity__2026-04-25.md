@@ -88,8 +88,54 @@ The build directive output trailed off mid-sentence, never reaching the roledef-
 
 ---
 
+---
+
+## Follow-up testing 2026-04-26: distribution-layer hypotheses falsified
+
+After the rename to `roledef` and the canonical-distribution move to `roledef.org` (via GitHub Pages + Cloudflare DNS), three additional Perplexity tests were run to falsify hypotheses about WHY Perplexity's initial fetch had failed. All three failed; the results converge on a clean conclusion.
+
+### Test 2: `https://roledef.org/jds/senior-jaded-vc-associate.openthing`
+
+**Hypothesis tested:** Perplexity's failure was specific to `raw.githubusercontent.com` (sandbox blocks GitHub raw subdomain).
+
+**Result:** Fetch failed. Perplexity reported the same kind of sandbox restriction it had reported for the GitHub raw URL, indicating the constraint is broader than GitHub-specific.
+
+**Hypothesis status:** Falsified. The roledef.org host (cleanly served via GitHub Pages + Cloudflare CDN, public 200 OK in all standard fetcher tests) is also unreachable from Perplexity's sandbox.
+
+### Test 3: `https://roledef.org/jds/senior-jaded-vc-associate.json`
+
+**Hypothesis tested:** Perplexity's failure was a content-type filter issue (sandbox refuses `application/octet-stream` responses, would accept `application/json`).
+
+**Result:** Fetch failed. The `.json` URL serves the same roledef content as `application/json; charset=utf-8` (verified via curl from the strategist environment); Perplexity still cannot fetch it.
+
+**Hypothesis status:** Falsified. The constraint is not content-type-based.
+
+### Three-test convergence: the constraint is model-sandbox-network, not anything fixable at the distribution layer
+
+Perplexity failed three consecutive fetches with progressively cleaner test conditions:
+
+1. `raw.githubusercontent.com/.../senior-jaded-vc-associate.openthing` (GitHub raw, octet-stream) → fail
+2. `roledef.org/.../senior-jaded-vc-associate.openthing` (different host, octet-stream) → fail
+3. `roledef.org/.../senior-jaded-vc-associate.json` (different host, application/json) → fail
+
+Each test held more variables constant. Same outcome. The constraint is unambiguously: **the model itself cannot make outbound HTTP requests, regardless of host, extension, or content-type.** No distribution-layer change can solve this for Perplexity-class runtimes.
+
+### Design principle articulated by Perplexity itself (worth elevating)
+
+In response to the third test result, Perplexity articulated the design principle for portable JD/roledef loading more crisply than the strategist had:
+
+> **"Runtime fetches, model never touches the network."**
+
+This is the canonical design principle for the openjd-load skill (and any future loading mechanisms). The model boundary cannot be assumed to include network access. Loading must happen at the runtime layer (where the user/operator has control over network policy), with the loaded content injected into the model as user-message-equivalent context.
+
+Implications:
+- The roledef.org distribution mirror is necessary but not sufficient — it solves the raw.githubusercontent.com fragility class for fetcher-CAPABLE runtimes (Claude Code, Grok Expert), but does nothing for fetcher-RESTRICTED runtimes (Perplexity, similar sandboxed models)
+- The openjd-load skill is critical-path infrastructure — the only mechanism that bridges the gap for fetcher-restricted runtimes
+- Future runtime classification should ask: "does this runtime allow the model to make outbound network requests?" If no, paste-fallback or skill-mediated loading is the only path
+
 ## Cross-references
 
 - roledef file: [`../../jds/senior-jaded-vc-associate.openthing`](../../jds/senior-jaded-vc-associate.openthing)
+- Mirror file: [`../../jds/senior-jaded-vc-associate.json`](../../jds/senior-jaded-vc-associate.json)
 - Sister conformance evidence: [`./senior-jaded-vc-associate__grok-expert__2026-04-25.md`](./senior-jaded-vc-associate__grok-expert__2026-04-25.md), [`./senior-jaded-vc-associate__claude-code__2026-04-25.md`](./senior-jaded-vc-associate__claude-code__2026-04-25.md), [`./senior-jaded-vc-associate__gemini__2026-04-25.md`](./senior-jaded-vc-associate__gemini__2026-04-25.md)
 - Conformance decision artifact: [`../../decisions/conformance-evidence-first-pass.md`](../../decisions/conformance-evidence-first-pass.md)
