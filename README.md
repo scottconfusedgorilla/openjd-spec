@@ -75,7 +75,7 @@ Empirically validated across four architecturally-different runtimes:
 | **Search-grounded** | Gemini (Google search grounding) | Loads via search index; partial contract by default; full contract with explicit reinforcement |
 | **Paste-fallback / skill-mediated** | Perplexity (sandboxed fetcher) | Refuses to improvise without content; loads from pasted content or skill-injected context |
 
-See [`conformance/runtime_evidence/`](conformance/runtime_evidence/) for full per-runtime evidence, including the design-principle falsification tests and the methodology lessons each runtime surfaced.
+See [`conformance/runtime_evidence/`](conformance/runtime_evidence/) for full per-runtime evidence, including the design-principle falsification tests and the methodology lessons each runtime surfaced. For current per-runtime status (which runtimes are amenable today, what loading mechanism each uses, what conformance evidence exists), see [`RUNTIME_AMENABILITY.md`](RUNTIME_AMENABILITY.md) — the living document that adopters should consult before choosing a runtime for their use case.
 
 ### Methodology rules surfaced from empirical testing
 
@@ -160,6 +160,7 @@ The same content is also accessible at `https://github.com/roledef-spec/roledef/
 roledef-spec/
 ├── README.md                       ← you are here
 ├── SCHEMA.md                       ← the roledef schema (MUST/SHOULD/x.)
+├── RUNTIME_AMENABILITY.md          ← per-runtime status + classification (living doc)
 ├── CONTRIBUTING.md                 ← how to contribute a roledef
 ├── CLAUDE.md                       ← maintainer operating manual
 ├── CNAME                           ← roledef.org GitHub Pages config
@@ -391,7 +392,7 @@ In progress for v0.1+:
 
 - ⏳ `roledef-load` Claude Code skill (critical-path infrastructure for fetch-restricted runtimes)
 - ⏳ Wrapper-v3 spec (formalizes fetch-or-stop + id-field verification + contract-completeness check)
-- ⏳ Runtime Amenability page on roledef.org (per-runtime current status)
+- ✅ [Runtime Amenability page](RUNTIME_AMENABILITY.md) (per-runtime current status, four-category classification, how to test new runtimes)
 - ⏳ Seed library expansion (catdef-maintainer, brother-blackhat-tester, more production extractions)
 
 Breaking changes are possible until v1.0.0 (target: when the seed library has 10+ roledefs across multiple domains and the schema has survived contact with several real-world contributors).
