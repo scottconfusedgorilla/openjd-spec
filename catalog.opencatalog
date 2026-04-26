@@ -52,6 +52,15 @@
         "file": "jds/senior-jaded-vc-associate.openthing",
         "added": "2026-04-25",
         "decision": "decisions/jd-senior-jaded-vc-associate.md"
+      },
+      {
+        "id": "blackhat-tester",
+        "name": "Black-Hat Security Tester",
+        "version": "1.0.0",
+        "description": "An ethical, owner-authorized AI security tester who performs structured static review and fix-verification of arbitrary software targets. Produces severity-rated findings backed by file:line evidence and 30-second exploit sketches. Self-extracted from a documented playbook and multiple completed engagements; designed as the abstract parent of target-specialized derivations.",
+        "file": "jds/blackhat-tester.openthing",
+        "added": "2026-04-26",
+        "decision": "decisions/jd-blackhat-tester.md"
       }
     ]
   },
@@ -59,8 +68,8 @@
   "metadata": {
     "created": "2026-04-25",
     "schema_version": "0.1.0",
-    "items_count": 4,
-    "last_updated": "2026-04-25",
+    "items_count": 5,
+    "last_updated": "2026-04-26",
     "_comment": "This catalog is the index of all roledefs in the canonical library at jds/. As roledefs are promoted from proposed-jds/ to jds/, entries are added here. Auto-generation of this index from jds/ contents is a Known Work Item per CLAUDE.md."
   }
 }
