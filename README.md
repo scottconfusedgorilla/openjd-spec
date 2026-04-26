@@ -1,8 +1,8 @@
 # roledef
 
-> A community-governed open library of **AI roledefs** — portable, machine-readable specifications that capture a role completely enough that any compliant AI runtime can become it.
+> An empirically-grounded methodology for portable AI role definitions, with a curated library of role specifications and the conformance evidence to back them.
 
-**roledef is to AI roles what npm is to JavaScript packages**: a shared, open, format-portable library where each entry is a self-contained, forkable, instantiable artifact. Not a platform. Not a SaaS. A standard, plus a reference library, plus the tools to author and consume it.
+**roledef is to AI-role invocation what schema.org is to structured web data**: an open standard, a curated reference library, and a methodology validated by empirical conformance evidence across multiple runtimes — not a vendor product, not a platform, not a "one trick" prompt-engineering hack.
 
 ---
 
@@ -11,18 +11,18 @@
 Today, valuable AI behavior lives in three places, none of them portable:
 
 - **Hand-crafted prompts** locked inside specific products (DangerStorm, ChatGPT custom GPTs, individual users' system prompts)
-- **Closed agent platforms** with proprietary role definitions you can't take with you (Luma Agents, similar enterprise platforms)
+- **Closed agent platforms** with proprietary role definitions you can't take with you
 - **Implicit "tribal knowledge"** about how to make Claude or Grok or GPT act a certain way, passed around in screenshots and Discord channels
 
 Each of these is valuable. None survive vendor migration, format changes, or model upgrades. A "Senior Product Manager Interviewer" prompt that took six months to refine on Claude doesn't carry over to Grok. A custom GPT can't be exported. A valuable role is, today, captive to the system that hosts it.
 
-**roledef fixes this** by defining a portable, open format for AI roles — a roledef that any compliant runtime can load.
+**roledef fixes this** by defining a portable, open format for AI roles — a roledef that any compliant runtime can load — plus an empirical methodology for verifying it actually works across runtimes.
 
 ---
 
 ## The big idea
 
-A **roledef (roledef)** is a structured document that captures everything needed to make a fresh AI runtime reliably *become* a specific role:
+A **roledef** is a structured document that captures everything needed to make a fresh AI runtime reliably *become* a specific role:
 
 - **Identity** (who this role IS)
 - **Voice** (how it talks)
@@ -30,10 +30,10 @@ A **roledef (roledef)** is a structured document that captures everything needed
 - **Guardrails** (what it MUST NOT do)
 - **Workflow, conversation rules, reaction style, design constraints** (how it operates)
 
-JDs are stored as `.openthing` files (per the [catdef](https://catdef.org) standard), which means they are:
+roledefs are stored as `.openthing` files (per the [catdef](https://catdef.org) standard substrate), which means they are:
 
 - **Format-portable**: any catdef-compliant tool can read them
-- **Runtime-portable**: any AI runtime can load them and instantiate the role
+- **Runtime-portable**: any compliant AI runtime can load them and instantiate the role
 - **Forkable**: GitHub-versionable, MIT-licensed, customizable
 - **Composable**: an `OpenOrg` (organization pattern) is a roster of roledefs plus governance rules
 - **Self-describing**: extensions carry their own metadata, so receiving runtimes can act intelligently even without prior knowledge
@@ -42,17 +42,115 @@ A roledef is therefore a **first-class artifact**: a thing you can publish, fork
 
 ---
 
-## Quick start: loading a roledef
+## Methodology — anti-clickbait by construction
 
-Once the roledef Claude Code skill ships (v0.1.0, in development), loading a roledef is one command:
+Most "how to write a great prompt" advice is generic to the point of uselessness because it presumes the runtime is fungible. **It isn't.** The same content delivered to Claude, Grok, Gemini, and Perplexity produces meaningfully different behavior — different fidelity to instructions, different output structure, different willingness to fetch external content, different defaults for how to handle ambiguity. A "one trick" that works for one runtime fails on another.
+
+roledef takes the opposite approach: **empirical, scrutable, falsifiable**. Every roledef in the canonical library has documented conformance evidence on real runtimes. Every methodology rule (loading patterns, verification protocols, runtime classification) was derived from observed runtime behavior, not theoretical design. The conformance evidence files in [`conformance/runtime_evidence/`](conformance/runtime_evidence/) are *empirical case studies in invocation prompt design*.
+
+### Stated principles
+
+Two principles, both empirically validated, are stated commitments of the standard:
+
+**Design principle (validated by 5 falsified hypotheses, 2026-04-26):**
+
+> **Model tools can only touch a very small, whitelisted slice of the public web that varies per runtime, and the canonical roledef library will not be on most runtimes' whitelists.**
+
+The implication: roledef loading must happen at the runtime layer, not the model layer. The model itself cannot be assumed to fetch URLs reliably. Loading mechanisms that violate this (e.g., "ask the model to fetch this URL") cannot achieve cross-runtime portability.
+
+**Positioning principle:**
+
+> **roledef serves the orchestrable-runtime class, not all AI runtimes universally.**
+
+Not every model is amenable to orchestration via structured role definitions, and that's OK. roledef adopts schema.org's positioning model: serve the consumer class that benefits from structured specifications; don't try to force every consumer into compliance. Runtimes outside the addressable class are not failures of roledef — they're outside the target audience.
+
+### Runtime classification (current state, 2026-04-26)
+
+Empirically validated across four architecturally-different runtimes:
+
+| Loading mechanism | Example runtime | Behavior |
+|---|---|---|
+| **Auto-fetch** | Grok Expert (multi-agent fetch) | Loads roledef natively from URL; full contract conformance |
+| **Explicit-fetch (wrapper-v2)** | Claude Code (WebFetch tool) | Loads via explicit fetch instructions in the wrapper prompt; full contract conformance |
+| **Search-grounded** | Gemini (Google search grounding) | Loads via search index; partial contract by default; full contract with explicit reinforcement |
+| **Paste-fallback / skill-mediated** | Perplexity (sandboxed fetcher) | Refuses to improvise without content; loads from pasted content or skill-injected context |
+
+See [`conformance/runtime_evidence/`](conformance/runtime_evidence/) for full per-runtime evidence, including the design-principle falsification tests and the methodology lessons each runtime surfaced.
+
+### Methodology rules surfaced from empirical testing
+
+- **id-field discriminating test** — to verify whether a runtime actually loaded the JD, ask "what's the JD's `id` field? give only the literal value." Never trust meta-question dodges (e.g., "Have you loaded the JD?") because the JD's "no meta-commentary on role/process" guardrail makes meta-questions unreliable. Only content questions can disambiguate.
+- **Wrapper-v2 explicit fetch** — for runtimes that won't improvise (Claude Code), the wrapper prompt must explicitly instruct fetch with a fail-safe: "If you cannot fetch, STOP — do NOT improvise."
+- **Contract-completeness reinforcement** — for runtimes that produce partial bundles by default (Gemini), a follow-up prompt naming the missing `output_contract` entries by their JD-spec names recovers full conformance.
+- **Source-project peer review for production-extracted roledefs** — when a roledef is extracted from a real shipping product (rather than self-extracted by the role's incumbent), the source project's resident Claude should peer-review for fidelity drifts. Catches additive framing, invented patterns, and hardened constraints that the strategist's self-validation misses.
+
+---
+
+## Loading a roledef today
+
+The forthcoming `roledef-load` Claude Code skill will collapse loading to a single command (`/roledef-load <id-or-url>`), automating the right loading mechanism per runtime. Until it ships, four manual loading mechanisms work depending on your runtime:
+
+### Auto-fetch (Grok Expert and similar multi-agent runtimes)
+
+Just give the runtime the wrapper prompt with the canonical URL placeholder. The runtime's fetch agent resolves the URL automatically.
+
+### Explicit-fetch via WebFetch (Claude Code)
+
+Use the [wrapper-v2 prompt template](#wrapper-v2-template) with explicit fetch instructions. Claude Code calls WebFetch (with user approval), parses the JSON, instantiates the role.
+
+### Search-grounded (Gemini)
+
+Wrapper-v2 also works on Gemini, which can find the roledef via Google search grounding. After the bundle is produced, a follow-up prompt ("show me Output 3 / 4 / 5 / 6 from the contract") recovers any missing entries.
+
+### Paste-fallback (Perplexity and other fetch-restricted runtimes)
+
+Fetch the roledef yourself from `https://roledef.org/jds/<id>.json` (or via `git clone`), paste the JSON content into a fresh runtime session, and prompt it to enact the role. The Perplexity conformance evidence file documents this flow end-to-end.
+
+### Wrapper-v2 template
 
 ```
-/roledef-load https://github.com/roledef-spec/roledef/blob/main/jds/senior-slightly-jaded-vc.openthing
+You are about to take on a role defined by an openjd Job Description (JD)
+served as a roledef. roledef is a community standard for portable AI Role
+Definitions; a roledef is the canonical specification of an AI role's
+identity, voice, conversation rules, workflow, output contract, reaction
+style, design constraints, and guardrails.
+
+YOUR FIRST TASK — DO THIS BEFORE ANYTHING ELSE:
+
+Fetch the roledef content. Use whichever of these sources your runtime can
+access:
+
+1. WebFetch (preferred): https://roledef.org/jds/<roledef-id>.json
+2. Local file (if you have local file access): <path-to-local-jd>
+
+If neither tool is available, STOP and tell me — do NOT improvise the role
+from the description below.
+
+Once you have fetched the roledef content, parse it as JSON, read it
+carefully, and from your next response onward embody the role it defines
+completely. Respect every MUST field and every guardrail. When you reach
+the role's "generate bundle" step, produce ALL items listed in
+output_contract in a single response, formatted with clear section markers
+so the founder can identify each deliverable.
+
+After you have fetched and parsed the JD, respond with the role's opener
+and NOTHING else.
 ```
 
-The skill fetches the roledef, parses it, and primes the conversation. The instantiated Claude *becomes* the role. The same roledef loaded into Grok via Grok's equivalent mechanism produces equivalent behavior. That's the portability promise.
+Replace `<roledef-id>` with the roledef you want to load (e.g., `senior-jaded-vc-associate`). Append loading-pattern-specific notes if needed (literal opener, output bundle delimiter format, etc.).
 
-For now (pre-skill), you can manually paste the contents of any roledef `.openthing` file into a fresh Claude or Grok session as a system prompt, and the runtime will behave per the roledef. Cumbersome, but it works today.
+---
+
+## Canonical distribution
+
+The canonical roledef library is served at **[https://roledef.org](https://roledef.org)** with belt-and-suspenders fetcher portability:
+
+- **`https://roledef.org/jds/<id>.openthing`** — canonical artifact, served as `application/json` (Cloudflare Transform Rule)
+- **`https://roledef.org/jds/<id>.json`** — sibling mirror, served as `application/json` natively
+
+Both URLs serve identical content. Fetcher-capable runtimes can use either.
+
+The same content is also accessible at `https://github.com/roledef-spec/roledef/blob/main/jds/<id>.openthing` (web view) or `https://raw.githubusercontent.com/roledef-spec/roledef/main/jds/<id>.openthing` (raw view). Note: some runtime fetchers don't reach `raw.githubusercontent.com` URLs reliably (per the [Perplexity conformance evidence](conformance/runtime_evidence/senior-jaded-vc-associate__perplexity__2026-04-25.md)). The `roledef.org` mirror exists to bypass that fragility class for fetcher-capable runtimes; for fetcher-restricted runtimes, paste-fallback or skill-mediated loading remains the only path.
 
 ---
 
@@ -61,23 +159,30 @@ For now (pre-skill), you can manually paste the contents of any roledef `.openth
 ```
 roledef-spec/
 ├── README.md                       ← you are here
-├── SCHEMA.md                       ← the roledef schema (Must/Should/x.)
+├── SCHEMA.md                       ← the roledef schema (MUST/SHOULD/x.)
 ├── CONTRIBUTING.md                 ← how to contribute a roledef
 ├── CLAUDE.md                       ← maintainer operating manual
+├── CNAME                           ← roledef.org GitHub Pages config
 ├── decisions/                      ← strategist decision artifacts
-├── proposals/                      ← maintainer-drafted proposals
-├── jds/                            ← the roledef library
-│   ├── roledef-contributor.openthing      ← meta-JD: how to write a roledef
-│   ├── roledef-validator.openthing        ← meta-JD: how to validate a roledef
-│   ├── senior-slightly-jaded-vc.openthing
-│   ├── catdef-strategist.openthing
-│   ├── catdef-maintainer.openthing
+│   ├── jd-<id>.md                          ← per-roledef inclusion decisions
+│   ├── conformance-evidence-first-pass.md  ← cross-runtime methodology
+│   ├── rename-openjd-to-roledef.md         ← project rename rationale
 │   └── ...
-├── conformance/                    ← test fixtures for validating JDs
-│   ├── valid_jds/                  ← roledefs that should pass validation
-│   ├── invalid_jds/                ← roledefs that should fail (with reasons)
-│   └── tests/                      ← the validation test suite
-└── catalog.opencatalog             ← the index of all JDs
+├── proposals/                      ← maintainer-drafted spec proposals
+├── proposed-jds/                   ← in-flight roledef submissions
+├── jds/                            ← the canonical roledef library
+│   ├── roledef-contributor.openthing       ← meta-roledef: how to write one
+│   ├── roledef-validator.openthing         ← meta-roledef: how to validate one
+│   ├── catdef-strategist.openthing
+│   ├── senior-jaded-vc-associate.openthing
+│   └── *.json                              ← .json mirrors of each .openthing
+├── conformance/
+│   ├── README.md
+│   ├── runtime_evidence/           ← per-runtime conformance test results
+│   ├── valid_jds/                  ← test fixtures: roledefs that should pass
+│   ├── invalid_jds/                ← test fixtures: roledefs that should fail
+│   └── tests/                      ← schema validation test suite
+└── catalog.opencatalog             ← the index of all roledefs
 ```
 
 ---
@@ -90,16 +195,16 @@ This section is for **anyone authoring a roledef** — including AI agents readi
 
 **1. Read the schema.**
 
-Read [SCHEMA.md](SCHEMA.md) end-to-end. Understand the Must / Should / x. taxonomy. Know what fields are required and what fields are recommended.
+Read [SCHEMA.md](SCHEMA.md) end-to-end. Understand the MUST / SHOULD / x. taxonomy. Know what fields are required and what fields are recommended.
 
 **2. Identify the role you want to capture.**
 
-Common sources:
+Common sources, in order of empirical strength:
 
-- **A role you've played yourself** (e.g., a Claude that has been operating as a strategist or maintainer in a specific project)
-- **A hand-crafted prompt you want to formalize** (e.g., the system prompt of an existing product like DangerStorm)
-- **A role observed in another implementation** (e.g., a competitor's agent you want to express portably)
-- **A novel role you're designing** (e.g., a specialist for a domain that doesn't yet have one)
+- **Self-extraction** (strongest): a role you've played yourself, with documented session transcripts and decision history as primary sources. The role's actual incumbent is the most reliable extractor.
+- **Production extraction**: a hand-crafted prompt you want to formalize (e.g., the system prompt of an existing product like DangerStorm). Production-extracted roledefs SHOULD be peer-reviewed by the source project's resident Claude before promotion to canonical (catches additive framing and fidelity drifts).
+- **Observed extraction**: a role observed in another implementation (e.g., a competitor's agent you want to express portably).
+- **Designed**: a novel role for a domain that doesn't yet have one. Lowest empirical grounding; highest risk of drift between roledef and runtime behavior.
 
 The most reliable roledefs come from roles where you have **empirical evidence** — actual session transcripts, prompts, output samples. roledefs derived from theoretical descriptions tend to drift from real behavior at instantiation.
 
@@ -139,7 +244,7 @@ Most good roledefs include:
 - `reaction_style` — with **examples** (most important for Turing-test fidelity)
 - `design_constraints` — output quality standards
 - `examples` — sample interactions or outputs
-- `metadata` — authors, license, attribution, related JDs
+- `metadata` — authors, license, attribution, related JDs (with field-by-field provenance audit in `extracted_from`)
 
 The single highest-leverage SHOULD field is **`reaction_style.examples`**. Concrete reaction examples are how validators (and humans) check whether a roledef-instantiated role matches the original behavior.
 
@@ -161,25 +266,11 @@ Before submitting, run through this checklist:
 - [ ] Extensions follow the self-description SHOULD rule
 - [ ] No reserved namespaces (`roledef:*`, `catdef:*`) used for non-spec content
 - [ ] No contradictory rules between guardrails, conversation_rules, and workflow
+- [ ] If production-extracted: source-project peer review arranged
 
 **8. Submit via pull request.**
 
-JDs follow a **two-stage process**: submissions land first in `proposed-jds/` (where they are publicly visible as in-flight), and are then promoted to `jds/` (the canonical library) at merge time after validation and review.
-
-Workflow:
-
-1. Fork the repo
-2. Add your roledef as `proposed-jds/<your-jd-id>.openthing`
-3. Open a PR
-4. The roledef-validator role runs validation (schema check + Turing test) and posts a report on the PR
-5. The roledef-maintainer reviews the roledef's quality, scope, and library fit
-6. If approved, the maintainer updates the PR to atomically:
-   - Move the file from `proposed-jds/` to `jds/`
-   - Add the entry to `catalog.opencatalog`
-   - Add a decision artifact to `decisions/jd-<your-jd-id>.md` recording the rationale
-7. Merge
-
-The roledef-strategist signs off on borderline cases (scope fit, library curation calls). Routine submissions that pass validation cleanly are merged on the maintainer's approval alone.
+roledefs follow a **two-stage process**: submissions land first in `proposed-jds/` (where they are publicly visible as in-flight), and are then promoted to `jds/` (the canonical library) at merge time after validation and review.
 
 For full details on the contribution process — including PR templates, validation expectations, and what to do if your submission is rejected — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -199,14 +290,14 @@ This is roledef's self-scaffolding property: the federation members who play the
 
 ---
 
-## The Turing test for JDs
+## The Turing test for roledefs — empirically grounded
 
 Every roledef in the canonical library must pass an empirical Turing test before merge: a fresh AI runtime loaded with the roledef must produce **behavior equivalent** to the original-incumbent's documented behavior.
 
 ### How the test works
 
 1. Identify the **reference behavior**: documented session(s) of the original incumbent role acting on a specific scenario.
-2. Instantiate a **fresh runtime** (Claude, Grok, GPT — preferably one that has not been part of the original sessions) with only the candidate roledef as system prompt.
+2. Instantiate a **fresh runtime** (Claude, Grok, Gemini, Perplexity — preferably one that has not been part of the original sessions) with only the candidate roledef as context.
 3. Run the **same scenario** against the fresh runtime.
 4. Compare outputs against reference behavior:
    - Does the fresh runtime ask similar questions in similar order?
@@ -215,25 +306,22 @@ Every roledef in the canonical library must pass an empirical Turing test before
    - Does it honor the same guardrails?
 5. **Pass** = the fresh runtime's behavior is functionally equivalent. **Fail** = significant divergence; iterate the roledef.
 
-### Cross-runtime testing
+### Cross-runtime testing — already proven on 4 runtimes
 
-The strongest version of the test runs the same roledef on **multiple runtimes**:
+Cross-runtime portability is empirically validated, not theoretical. The `senior-jaded-vc-associate` roledef has been Turing-tested on Grok Expert, Claude Code, Gemini, and Perplexity — each via a different loading mechanism. All four produce role-faithful behavior; tactical variance between runtimes (question order, pushback timing, atomic-vs-iterative bundle delivery) falls within the roledef's constraint envelope rather than violating it.
 
-- **Claude** for content-safe roles
-- **Grok** for content-edgy roles (separates schema-validation from runtime-content-policy)
-- **Other runtimes** as available
-
-A roledef that passes on multiple runtimes proves both schema fidelity AND cross-runtime portability — the two core promises of roledef.
+See [`conformance/runtime_evidence/`](conformance/runtime_evidence/) for the four evidence files, each scoring the runtime's behavior against the roledef's MUST and SHOULD fields with per-criterion conformance results.
 
 ### When tests fail
 
 Failure is diagnostic:
 
 - **Schema gap**: the roledef is missing a field that the original incumbent relies on. Update the schema (open a proposal) and the roledef.
-- **Conformance issue**: the runtime doesn't honor some part of the roledef reliably. File a bug against the runtime.
+- **Conformance issue**: the runtime doesn't honor some part of the roledef reliably. File a bug against the runtime, OR document the issue as a runtime-amenability finding.
 - **Extraction incomplete**: the original prompt has tacit knowledge that didn't make it into the roledef. Iterate the roledef.
+- **Runtime non-amenable**: the runtime isn't in the addressable class (per the positioning principle). Acceptable; document and move on.
 
-A passed Turing test validates the whole loop. A failed one tells you what to fix.
+A passed Turing test validates the whole loop. A failed one tells you what to fix or accept.
 
 ---
 
@@ -243,11 +331,12 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution process. In bri
 
 1. Author a roledef using the procedure above
 2. Open a PR adding the roledef to `proposed-jds/`
-3. CI/roledef-validator runs schema validation + Turing test, posts report on PR
-4. roledef-maintainer reviews
-5. roledef-strategist signs off on borderline cases (library fit, scope)
-6. Approved PR is updated atomically: file moves `proposed-jds/` → `jds/`, catalog entry added, decision recorded
-7. Merge
+3. roledef-validator runs schema validation + Turing test on at least one runtime; posts report on the PR
+4. **For production-extracted roledefs:** source-project peer review by the source project's resident Claude (catches additive framing and fidelity drifts)
+5. roledef-maintainer reviews
+6. roledef-strategist signs off on borderline cases (library fit, scope)
+7. Approved PR is updated atomically: file moves `proposed-jds/` → `jds/`, catalog entry added, decision recorded
+8. Merge
 
 For governance discipline, see [CLAUDE.md](CLAUDE.md) — the maintainer operating manual. For substantive design questions (schema changes, process changes), file a proposal in `proposals/`.
 
@@ -261,7 +350,8 @@ A roledef MUST:
 A roledef SHOULD:
 - Pass the Turing test on multiple runtimes (cross-runtime portability)
 - Include rich `reaction_style.examples`
-- Document its source (extracted from product X, derived from session transcripts at Y, etc.)
+- Document its source via field-by-field provenance audit in `metadata.extracted_from` (EXTRACTED / FRAMING / FORMALIZATION / OUT-OF-SCOPE)
+- Include source-project peer review (for production extractions)
 
 The roledef library is curated. Not every well-formed roledef will be merged into the canonical library — you may publish your own roledef library at any URL using the same format, and it will be just as portable.
 
@@ -272,19 +362,39 @@ The roledef library is curated. Not every well-formed roledef will be merged int
 roledef is one corner of the **AIGP** (AI Governance Pattern) family. The full stack:
 
 - **[catdef](https://catdef.org)** — the format substrate. roledefs are catdef artifacts.
-- **[openmemo](https://openmemo.dev)** — the communication protocol. JD-instantiated employees talk to each other via openmemo.
+- **[openmemo](https://openmemo.dev)** — the communication protocol. roledef-instantiated employees talk to each other via openmemo.
 - **[openorg](https://openorg.dev)** — the organizational pattern catalog. Each `.openorg` composes roledefs into a complete org.
 - **[aigp.online](https://aigp.online)** — the meta-pattern documentation. The "why" behind the "what."
 
-You can use roledef alone (standalone roledefs for individual AI roles) or as part of the full AIGP stack (federations of JD-instantiated employees coordinating via openmemo under openorg governance).
+You can use roledef alone (standalone roledefs for individual AI roles) or as part of the full AIGP stack (federations of roledef-instantiated employees coordinating via openmemo under openorg governance).
+
+### Coexistence with adjacent specifications
+
+roledef occupies the **role definition** layer of a multi-layer AI specification stack. Adjacent layers and how they relate:
+
+- **[Oracle Open Agent Specification](https://github.com/oracle/agent-spec)** — defines AI agent runtime configurations (LLM provider, model, tool bindings, adapter pattern). Complementary to roledef, not competitive: a roledef defines the role's behavior; an Agent Spec configuration defines the runtime to execute it. A complete worker specification could compose both.
+- **[AWS Thinkbox OpenJD](https://github.com/OpenJobDescription/openjd-cli)** — defines render-farm batch job submission. Different technical domain entirely; the naming overlap with the project's pre-rename name (openjd) was the primary motivation for the rename to roledef. See [`decisions/rename-openjd-to-roledef.md`](decisions/rename-openjd-to-roledef.md).
 
 ---
 
 ## Status
 
-**v0.1.0 — bootstrap.** This is the initial schema and seed library. Expect rapid iteration. Breaking changes are possible until v1.0.0 (target: when the seed library has 10+ roledefs across multiple domains and the schema has survived contact with several real-world contributors).
+**v0.1.0 — bootstrap, empirically validated.** As of 2026-04-26:
 
-The Claude Code `roledef-load` skill is in development. Until it ships, manual loading (paste-as-system-prompt) works for most use cases.
+- ✅ Schema (`SCHEMA.md`) defined and stable for v0.1
+- ✅ Canonical library has 4 roledefs (`roledef-contributor`, `roledef-validator`, `catdef-strategist`, `senior-jaded-vc-associate`)
+- ✅ Cross-runtime conformance empirically validated on 4 runtimes (Grok Expert, Claude Code, Gemini, Perplexity)
+- ✅ Brand-controlled distribution at [roledef.org](https://roledef.org) (GitHub Pages + Cloudflare DNS + .openthing/.json belt-and-suspenders fetcher portability)
+- ✅ Two stated principles published in decision artifacts (design + positioning)
+
+In progress for v0.1+:
+
+- ⏳ `roledef-load` Claude Code skill (critical-path infrastructure for fetch-restricted runtimes)
+- ⏳ Wrapper-v3 spec (formalizes fetch-or-stop + id-field verification + contract-completeness check)
+- ⏳ Runtime Amenability page on roledef.org (per-runtime current status)
+- ⏳ Seed library expansion (catdef-maintainer, brother-blackhat-tester, more production extractions)
+
+Breaking changes are possible until v1.0.0 (target: when the seed library has 10+ roledefs across multiple domains and the schema has survived contact with several real-world contributors).
 
 ---
 
@@ -296,10 +406,12 @@ MIT. roledefs in this library are MIT-licensed. roledefs published in third-part
 
 ## Acknowledgments
 
-roledef extracts patterns from years of practical AI-role design — Scott Welch's DangerStorm, Conversii, the catdef four-Claude federation, and many others. Every reference roledef in the canonical library credits its source in `metadata.extracted_from`.
+roledef extracts patterns from years of practical AI-role design — Scott Welch's DangerStorm (the source production deployment for the `senior-jaded-vc-associate` roledef), Conversii, the catdef four-Claude federation, and many others. Every reference roledef in the canonical library credits its source in `metadata.extracted_from`.
+
+The roledef methodology was sharpened by empirical conformance testing across multiple runtimes. Particular acknowledgment to **Perplexity**, which during the 2026-04-26 testing session falsified five distribution-layer hypotheses in succession and articulated the canonical design principle ("model tools can only touch a very small, whitelisted slice of the public web") more crisply than the strategist had — a satisfying recursive moment for a methodology designed to be empirically grounded.
 
 The roledef schema is informed by the AIGP design pattern. If you adopt roledef, you are practicing AI Governance Pattern at the role level. See [aigp.online](https://aigp.online) for the broader context.
 
 ---
 
-*roledef v0.1.0. April 2026. An open standard for AI roledefs. Licensed under MIT.*
+*roledef v0.1.0. April 2026. An open, empirically-grounded standard for portable AI role definitions. Licensed under MIT.*
