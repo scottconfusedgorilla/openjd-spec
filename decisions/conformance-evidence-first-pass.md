@@ -62,11 +62,33 @@ The 30-day runtime Turing test target — *"Recommended target: within 30 days, 
 
 The "Claude AND Grok" testing methodology in the original roledef README presumed both runtimes could load roledefs natively. Empirical evidence shows only some runtimes can. The methodology should be re-stated as: *"Test on every runtime where the roledef can be loaded; report per-runtime conformance separately."*
 
+## Stated design principle (v0.1+, articulated by Perplexity 2026-04-26)
+
+> **Runtime fetches, model never touches the network.**
+
+This is the canonical design principle for portable roledef loading. The model boundary cannot be assumed to include network access. Loading must happen at the runtime layer (where the user/operator has control over network policy), with the loaded content injected into the model as user-message-equivalent context.
+
+**Empirical justification:** Perplexity-class runtimes were tested with three progressively-cleaner distribution-layer hypotheses (different host, different content-type, different file extension). All three failed identically. The constraint is fundamentally that the model itself cannot make outbound HTTP requests — no host change, content-type change, or file extension change addresses this. See [`../conformance/runtime_evidence/senior-jaded-vc-associate__perplexity__2026-04-25.md`](../conformance/runtime_evidence/senior-jaded-vc-associate__perplexity__2026-04-25.md) §"Follow-up testing 2026-04-26" for the three-test convergence.
+
+**Architectural implication:** distribution-layer fixes (canonical mirror at roledef.org, .json mirrors, content-type rewrites) help fetcher-CAPABLE runtimes by removing fragility classes — but they cannot help fetcher-RESTRICTED runtimes. The only mechanism that bridges the gap is moving the fetch responsibility from the model to the runtime layer. The roledef-load skill is the canonical implementation of this principle.
+
+**Beneficiary segmentation (refinement, articulated by Perplexity 2026-04-26):** the distribution-layer work is high-value for three constituencies, just not for fetcher-restricted models:
+- **Fetcher-capable runtimes** (Claude Code WebFetch, Grok Expert multi-agent fetch, future architectures): cleaner URLs, better Content-Type negotiation, brand-controlled distribution surviving repo restructuring
+- **Humans:** short, memorable, browser-readable roledef.org URLs for sharing and pointing others
+- **Implementers building roledef-aware tools** (validators, viewers, registries, CLIs, IDE plugins): predictable, well-served distribution to integrate against
+- **NOT fetcher-restricted models:** distribution-layer work delivers them nothing; runtime-side loading is their only path
+
+This segmentation prevents the strategic mistake of viewing the openjd-load skill and the roledef.org distribution as substitutes. They are complements serving different beneficiaries.
+
+**Strategic implication for the standard:** roledef should document this design principle prominently in the README's "Loading a roledef" section. Future loading mechanisms (skill, MCP server, CLI tool, IDE integration) should all honor it. Loading mechanisms that violate it (e.g., "ask the model to fetch this URL") cannot achieve cross-runtime portability and should be discouraged in roledef methodology guidance.
+
+**Attribution:** the principle was articulated in this exact phrasing by Perplexity during the 2026-04-26 follow-up testing session, after the third consecutive distribution-layer hypothesis was falsified. Worth noting that the runtime under test articulated the design principle for its own loading infrastructure — a satisfying recursive moment for the openjd / roledef methodology.
+
 ## Promotion: `roledef-load` Claude Code skill
 
 This decision **promotes the `roledef-load` Claude Code skill from "v1.5+ aspirational tooling" to "v0.1+ critical-path infrastructure"** for the roledef standard's adoption story.
 
-Justification: three of four major runtimes tested (75%) could not natively fetch the roledef URL. Without the skill, those runtimes' users cannot use roledefs except by manually pasting 200+ lines of JSON into prompts — a bar most users will not clear. The skill makes roledef usable for the largest constituency (Claude users) and is therefore load-bearing.
+Justification: three of four major runtimes tested (75%) could not natively fetch the roledef URL. Without the skill, those runtimes' users cannot use roledefs except by manually pasting 200+ lines of JSON into prompts — a bar most users will not clear. The skill makes roledef usable for the largest constituency (Claude users) and is therefore load-bearing. The 2026-04-26 follow-up testing further confirms: even with brand-controlled distribution at roledef.org, fetcher-restricted runtimes (Perplexity-class) require runtime-side loading. The skill is the only portable loading mechanism for that runtime class.
 
 Skill scope (sketched, not normative):
 - Accept a roledef identifier or URL as input

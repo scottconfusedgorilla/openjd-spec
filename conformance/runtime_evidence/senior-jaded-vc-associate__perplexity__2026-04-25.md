@@ -88,8 +88,79 @@ The build directive output trailed off mid-sentence, never reaching the roledef-
 
 ---
 
+---
+
+## Follow-up testing 2026-04-26: distribution-layer hypotheses falsified
+
+After the rename to `roledef` and the canonical-distribution move to `roledef.org` (via GitHub Pages + Cloudflare DNS), three additional Perplexity tests were run to falsify hypotheses about WHY Perplexity's initial fetch had failed. All three failed; the results converge on a clean conclusion.
+
+### Test 2: `https://roledef.org/jds/senior-jaded-vc-associate.openthing`
+
+**Hypothesis tested:** Perplexity's failure was specific to `raw.githubusercontent.com` (sandbox blocks GitHub raw subdomain).
+
+**Result:** Fetch failed. Perplexity reported the same kind of sandbox restriction it had reported for the GitHub raw URL, indicating the constraint is broader than GitHub-specific.
+
+**Hypothesis status:** Falsified. The roledef.org host (cleanly served via GitHub Pages + Cloudflare CDN, public 200 OK in all standard fetcher tests) is also unreachable from Perplexity's sandbox.
+
+### Test 3: `https://roledef.org/jds/senior-jaded-vc-associate.json`
+
+**Hypothesis tested:** Perplexity's failure was a content-type filter issue (sandbox refuses `application/octet-stream` responses, would accept `application/json`).
+
+**Result:** Fetch failed. The `.json` URL serves the same roledef content as `application/json; charset=utf-8` (verified via curl from the strategist environment); Perplexity still cannot fetch it.
+
+**Hypothesis status:** Falsified. The constraint is not content-type-based.
+
+### Test 4 (final): `https://roledef.org/jds/senior-jaded-vc-associate.json` after Cloudflare Transform Rule deployment
+
+**Hypothesis tested:** Some residual distribution-layer variable is responsible (Cloudflare's edge configuration, header negotiation, etc.).
+
+**Conditions:** All preceding distribution-layer fixes in place — `.json` mirror live (PR #8 merged), Cloudflare Transform Rule active (the `.openthing` URLs ALSO now serve `application/json; charset=utf-8`), GitHub Pages + Cloudflare CDN serving cleanly, all four roledefs verified via curl returning HTTP 200 with correct Content-Type.
+
+**Result:** Fetch failed. Perplexity confirmed: *"I still can't see that JSON file from inside this environment; the URL doesn't resolve to a fetchable document for my tools, even with the .json extension and proper Content-Type on roledef.org."*
+
+**Hypothesis status:** Falsified. Distribution-layer is fully exhausted as a class of solutions for fetcher-restricted runtimes.
+
+### Four-test convergence: the constraint is model-sandbox-network, not anything fixable at the distribution layer
+
+Perplexity failed four consecutive fetches with progressively cleaner test conditions:
+
+1. `raw.githubusercontent.com/.../senior-jaded-vc-associate.openthing` (GitHub raw, octet-stream) → fail
+2. `roledef.org/.../senior-jaded-vc-associate.openthing` (different host, octet-stream) → fail
+3. `roledef.org/.../senior-jaded-vc-associate.json` (different host, application/json native) → fail
+4. `roledef.org/.../senior-jaded-vc-associate.json` (same as #3, with full Cloudflare Transform Rule on .openthing URLs ALSO active) → fail
+
+Each test held more variables constant. Same outcome. The constraint is unambiguously: **the model itself cannot make outbound HTTP requests, regardless of host, extension, content-type, or edge configuration.** No distribution-layer change can solve this for Perplexity-class runtimes.
+
+### Beneficiary segmentation (refinement articulated by Perplexity 2026-04-26)
+
+Perplexity refined the strategic implication of the four-test convergence:
+
+> "Your distribution tweaks are mostly wins for **runtimes and humans**, not for **direct model access**."
+
+This refinement is genuinely useful — the distribution-layer work is high-value for three constituencies, just not for the one this evidence file's runtime falls into:
+
+- **Fetcher-capable runtimes** (Claude Code's WebFetch tool, Grok Expert's multi-agent fetch, future fetcher-capable runtime architectures): benefit from cleaner URLs, better Content-Type negotiation, brand-controlled distribution that survives repo restructuring
+- **Humans**: benefit from short, memorable, browser-readable roledef.org URLs; sharing roledefs or pointing others to them has a cleaner artifact than a raw GitHub URL
+- **Implementers building roledef-aware tools** (validators, viewers, registries, CLIs, IDE plugins): benefit from predictable, well-served, brand-controlled distribution to integrate against
+
+**Only fetcher-restricted models (Perplexity-class) get nothing from distribution-layer work.** For them, runtime-side loading (the openjd-load skill, MCP-mediated loading, paste-fallback) is the only path — and that was always going to be true, per the design principle. The distribution-layer wins are not invalidated by Perplexity's failure; they apply to a different beneficiary set.
+
+### Design principle articulated by Perplexity itself (worth elevating)
+
+In response to the third test result, Perplexity articulated the design principle for portable JD/roledef loading more crisply than the strategist had:
+
+> **"Runtime fetches, model never touches the network."**
+
+This is the canonical design principle for the openjd-load skill (and any future loading mechanisms). The model boundary cannot be assumed to include network access. Loading must happen at the runtime layer (where the user/operator has control over network policy), with the loaded content injected into the model as user-message-equivalent context.
+
+Implications:
+- The roledef.org distribution mirror is necessary but not sufficient — it solves the raw.githubusercontent.com fragility class for fetcher-CAPABLE runtimes (Claude Code, Grok Expert), but does nothing for fetcher-RESTRICTED runtimes (Perplexity, similar sandboxed models)
+- The openjd-load skill is critical-path infrastructure — the only mechanism that bridges the gap for fetcher-restricted runtimes
+- Future runtime classification should ask: "does this runtime allow the model to make outbound network requests?" If no, paste-fallback or skill-mediated loading is the only path
+
 ## Cross-references
 
 - roledef file: [`../../jds/senior-jaded-vc-associate.openthing`](../../jds/senior-jaded-vc-associate.openthing)
+- Mirror file: [`../../jds/senior-jaded-vc-associate.json`](../../jds/senior-jaded-vc-associate.json)
 - Sister conformance evidence: [`./senior-jaded-vc-associate__grok-expert__2026-04-25.md`](./senior-jaded-vc-associate__grok-expert__2026-04-25.md), [`./senior-jaded-vc-associate__claude-code__2026-04-25.md`](./senior-jaded-vc-associate__claude-code__2026-04-25.md), [`./senior-jaded-vc-associate__gemini__2026-04-25.md`](./senior-jaded-vc-associate__gemini__2026-04-25.md)
 - Conformance decision artifact: [`../../decisions/conformance-evidence-first-pass.md`](../../decisions/conformance-evidence-first-pass.md)
