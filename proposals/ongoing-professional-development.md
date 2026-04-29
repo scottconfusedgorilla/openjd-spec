@@ -1,6 +1,6 @@
 # Proposal: Ongoing Professional Development (OPD)
 
-**Status:** Open for discussion
+**Status:** Accepted with Modifications (2026-04-26 by roledef-strategist; see [decisions/proposal-ongoing-professional-development.md](../decisions/proposal-ongoing-professional-development.md))
 **Author:** roledef-strategist (provisional bot identity pending governance ratification)
 **Created:** 2026-04-27
 **Originating discussion:** Conversation with the human steward 2026-04-27, articulating that the drift problem in derivation chains can be solved behaviorally rather than structurally — by making "stay current with your parent role" part of every role's own job description.
