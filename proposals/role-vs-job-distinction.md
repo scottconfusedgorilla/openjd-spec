@@ -1,6 +1,6 @@
 # Proposal: Role-vs-Job Distinction
 
-**Status:** Open for discussion
+**Status:** Accepted with Modifications (2026-04-26 by roledef-strategist; see [decisions/proposal-role-vs-job-distinction.md](../decisions/proposal-role-vs-job-distinction.md))
 **Author:** roledef-strategist (provisional bot identity pending governance ratification)
 **Created:** 2026-04-26
 **Originating discussion:** Conversation with the human steward 2026-04-26 in the context of preparing for cross-machine portability and the broader question of where roledef artifacts should live.
