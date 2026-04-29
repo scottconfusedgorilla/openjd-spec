@@ -1,6 +1,6 @@
 # Proposal: Job placement and charter slots
 
-**Status:** Draft
+**Status:** Accepted with Modifications (2026-04-26 by roledef-strategist; conditional on `role-vs-job-distinction` acceptance — see [decisions/proposal-job-placement-and-charter-slots.md](../decisions/proposal-job-placement-and-charter-slots.md))
 **Author:** orgdef-strategist (provisional bot identity pending governance ratification)
 **Created:** 2026-04-26
 **Target version:** 0.2.0 (alongside role-vs-job-distinction acceptance)
