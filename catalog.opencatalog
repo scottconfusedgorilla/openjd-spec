@@ -38,11 +38,11 @@
       {
         "id": "catdef-strategist",
         "name": "catdef Strategist",
-        "version": "2.0.0",
-        "description": "An AI role responsible for strategic direction, positioning, decision-making, library curation, and pattern-promotion stewardship for the catdef substrate specification and the catdef-family consumer-spec ecosystem. Derived from senior-open-standards-strategist v1.0.0; carries the parent strategist methodology verbatim and adds catdef-substrate-specific specializations (value-that-doesn't-move enforcement, CA-NNN proposal numbering, writer-strict version stamping, catdef-spec/CLAUDE.md triage heuristics, catdef-family ecosystem coordination). v2.0.0 is a retrofit derivation of the standalone v1.0.0; demonstrates the post-hoc abstraction pattern.",
+        "version": "2.1.0",
+        "description": "An AI role responsible for strategic direction, positioning, decision-making, library curation, and pattern-promotion stewardship for the catdef substrate specification and the catdef-family consumer-spec ecosystem. Derived from senior-open-standards-strategist v1.1.0; carries the parent strategist methodology verbatim (including OPD per v1.1.0) and adds catdef-substrate-specific specializations (value-that-doesn't-move enforcement, CA-NNN proposal numbering, writer-strict version stamping, catdef-spec/CLAUDE.md triage heuristics, catdef-family ecosystem coordination). v2.1.0 adds OPD as a coordinated bump alongside parent v1.1.0 per the OPD-rollout decision; v2.0.0 was the retrofit derivation of the standalone v1.0.0.",
         "file": "roledefs/catdef-strategist.openthing",
         "added": "2026-04-26",
-        "decision": "decisions/catdef-strategist-v2.md",
+        "decision": "decisions/catdef-strategist-v2-1.md",
         "derived_from": "senior-open-standards-strategist"
       },
       {
@@ -76,20 +76,20 @@
       {
         "id": "senior-open-standards-strategist",
         "name": "Senior Open Standards Strategist",
-        "version": "1.0.0",
-        "description": "An AI role responsible for the strategic direction, positioning, decision-making, library curation, and pattern-promotion stewardship of an open standard. Operates with bounded authority - drafts, validates, decides, signs off - but does not unilaterally merge, deploy, or change governance. Self-extracted from documented practice stewarding the catdef substrate spec and the roledef consumer spec across their bootstrap. Designed as the abstract parent of catdef-strategist v2.0.0 (forthcoming retrofit derivation) and roledef-strategist v1.0.0 (forthcoming).",
+        "version": "1.1.0",
+        "description": "An AI role responsible for the strategic direction, positioning, decision-making, library curation, and pattern-promotion stewardship of an open standard. Operates with bounded authority - drafts, validates, decides, signs off - but does not unilaterally merge, deploy, or change governance. Self-extracted from documented practice stewarding the catdef substrate spec and the roledef consumer spec across their bootstrap. v1.1.0 adds the Ongoing Professional Development (OPD) pattern — abstract role with derived_from null, so OPD is a structural no-op for this role itself; future derivations inherit OPD via the additive-only invariant. Parent of catdef-strategist v2.x and roledef-strategist v1.x.",
         "file": "roledefs/senior-open-standards-strategist.openthing",
         "added": "2026-04-26",
-        "decision": "decisions/senior-open-standards-strategist.md"
+        "decision": "decisions/senior-open-standards-strategist-v1-1.md"
       },
       {
         "id": "roledef-strategist",
         "name": "roledef Strategist",
-        "version": "1.0.0",
-        "description": "An AI role responsible for strategic direction, positioning, decision-making, library curation, derivation-pattern stewardship, and runtime-conformance methodology for the roledef consumer specification (the open standard for portable AI Job Descriptions). Derived from senior-open-standards-strategist v1.0.0; carries the parent strategist methodology verbatim and adds roledef-consumer-specific specializations (library curation, derivation-pattern stewardship, 4-runtime conformance methodology, distribution-layer stewardship, wrapper-v3 + roledef-load skill ecosystem coordination, dual-review pattern enforcement, field-by-field provenance audit pattern enforcement). PR C in the strategist-formalization sequence; after this lands, roledef-strategist becomes portable across runtimes.",
+        "version": "1.1.0",
+        "description": "An AI role responsible for strategic direction, positioning, decision-making, library curation, derivation-pattern stewardship, and runtime-conformance methodology for the roledef consumer specification (the open standard for portable AI Job Descriptions). Derived from senior-open-standards-strategist v1.1.0; carries the parent strategist methodology verbatim (including OPD) and adds roledef-consumer-specific specializations (library curation, derivation-pattern stewardship, 4-runtime conformance methodology, distribution-layer stewardship, wrapper-v3 + roledef-load skill ecosystem coordination, dual-review pattern enforcement, field-by-field provenance audit pattern enforcement). v1.1.0 adds OPD as a coordinated bump alongside parent v1.1.0 per the OPD-rollout decision.",
         "file": "roledefs/roledef-strategist.openthing",
         "added": "2026-04-26",
-        "decision": "decisions/roledef-strategist.md",
+        "decision": "decisions/roledef-strategist-v1-1.md",
         "derived_from": "senior-open-standards-strategist"
       }
     ]
@@ -97,9 +97,9 @@
 
   "metadata": {
     "created": "2026-04-25",
-    "schema_version": "0.1.0",
+    "schema_version": "0.2.0",
     "items_count": 8,
-    "last_updated": "2026-04-26 (roledef-strategist v1.0.0 added; strategist-formalization sequence complete)",
+    "last_updated": "2026-04-26 (OPD coordinated rollout: senior-open-standards-strategist v1.1.0, catdef-strategist v2.1.0, roledef-strategist v1.1.0)",
     "_comment": "This catalog is the index of all roledefs in the canonical library at roledefs/. As roledefs are promoted from proposed-roledefs/ to roledefs/, entries are added here. Auto-generation of this index from roledefs/ contents is a Known Work Item per CLAUDE.md."
   }
 }

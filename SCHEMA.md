@@ -596,33 +596,38 @@ OPD is a no-op for roles with `metadata.derived_from: null` — no parent means 
 
 #### 1. Workflow phase
 
-Add a recognized phase to the role's `workflow` (when `workflow.type: "engagement_loop"`):
+Add a recognized phase to the role's `workflow` as a flat sibling key alongside the existing engagement_loop phases (`engagement_setup`, `submission_decision`, etc.):
 
 ```json
 "workflow": {
   "type": "engagement_loop",
-  "phases": {
-    "ongoing_professional_development": [
-      "Check metadata.derived_from. If null, skip OPD entirely.",
-      "Read the OPD state file at <working-repo>/opd-state/<role-id>.json (create on first run with last_check timestamp = now).",
-      "If less than the role's metadata.opd_frequency_days days have elapsed since last_check, skip OPD until next session.",
-      "Otherwise: fetch the current version of metadata.derived_from.url. Compare against the version recorded in metadata.derived_from.version (the fork-time version).",
-      "Diff the parent at fork-time-version vs current-version. Identify changes affecting any field this role inherits or could be impacted by.",
-      "Categorize changes: (a) material (would change this role's behavior or output if adopted), (b) cosmetic (no behavioral impact), (c) inapplicable (parent change targets a domain this role doesn't operate in).",
-      "If material changes exist: draft an opd_review_memo to the overseer with parent identity, fork version, current version, categorized diff, and recommendation (incorporate / partially incorporate / decline / defer).",
-      "Update the OPD state file: last_check = now, last_known_parent_version = parent's current version.",
-      "If no material changes: still update last_check timestamp; no memo needed (or send an informational 'no material drift' memo at the overseer's preference).",
-      "Continue with the engagement after dispatching the OPD memo; do not block on overseer response."
-    ]
-  }
+  "engagement_setup": [...],
+  "submission_decision": [...],
+  "atomic_promotion": [...],
+  "pattern_promotion": [...],
+  "ongoing_professional_development": [
+    "Check metadata.derived_from. If null, skip OPD entirely.",
+    "Read the OPD state file at <working-repo>/opd-state/<role-id>.json (create on first run with last_check timestamp = now).",
+    "If less than the role's metadata.opd_frequency_days days have elapsed since last_check, skip OPD until next session.",
+    "Otherwise: fetch the current version of metadata.derived_from.url. Compare against the version recorded in metadata.derived_from.version (the fork-time version).",
+    "Diff the parent at fork-time-version vs current-version. Identify changes affecting any field this role inherits or could be impacted by.",
+    "Categorize changes: (a) material (would change this role's behavior or output if adopted), (b) cosmetic (no behavioral impact), (c) inapplicable (parent change targets a domain this role doesn't operate in).",
+    "If material changes exist: draft an opd_review_memo to the overseer with parent identity, fork version, current version, categorized diff, and recommendation (incorporate / partially incorporate / decline / defer).",
+    "Update the OPD state file: last_check = now, last_known_parent_version = parent's current version.",
+    "If no material changes: still update last_check timestamp; no memo needed (or send an informational 'no material drift' memo at the overseer's preference).",
+    "Continue with the engagement after dispatching the OPD memo; do not block on overseer response."
+  ],
+  "engagement_close": [...]
 }
 ```
+
+The `ongoing_professional_development` key is a flat sibling — engagement_loop workflows do NOT use a `phases` wrapper. This matches the existing convention established by `senior-open-standards-strategist` v1.0.0's workflow shape.
 
 #### 2. Conversation rule
 
 Add to the role's `conversation_rules` array:
 
-> "At session start, after reading the operating manual and memory file, run the OPD check (per workflow.phases.ongoing_professional_development). The check is fast when no review is due (state-file timestamp comparison only). When a review IS due, run it before substantive work; the overseer's response is asynchronous."
+> "At session start, after reading the operating manual and memory file, run the OPD check (per workflow.ongoing_professional_development). The check is fast when no review is due (state-file timestamp comparison only). When a review IS due, run it before substantive work; the overseer's response is asynchronous."
 
 #### 3. Output contract entry
 
