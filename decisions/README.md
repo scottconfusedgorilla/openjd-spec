@@ -57,7 +57,7 @@ Each decision is a markdown file with structured frontmatter:
 
 Decisions made and lost are decisions remade. Without artifacts, every strategist session re-litigates everything. With artifacts, prior reasoning is accessible to anyone reading the repo.
 
-This is the roledef realization of the AIGP "open governance" principle: every meaningful decision leaves a public, auditable trail.
+This is the roledef realization of the OAGP "open governance" principle: every meaningful decision leaves a public, auditable trail.
 
 ---
 

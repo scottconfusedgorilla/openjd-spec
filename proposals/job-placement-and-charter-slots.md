@@ -40,7 +40,7 @@ Add two OPTIONAL fields to the Job type defined by role-vs-job-distinction. Both
 Single statement of the stable slot of responsibility this job fills. Distinguishes one job from another when both derive from the same parent role.
 
 ```json
-"charter": "Holds delegated authority for orgdef-spec design decisions: library curation, scope narrowing, pattern promotion, MUST/SHOULD calls, and architectural deliberation. The stable slot of responsibility is 'orgdef as a credible open standard within the AIGP family.'"
+"charter": "Holds delegated authority for orgdef-spec design decisions: library curation, scope narrowing, pattern promotion, MUST/SHOULD calls, and architectural deliberation. The stable slot of responsibility is 'orgdef as a credible open standard within the OAGP family.'"
 ```
 
 Format guidance: prose, 1–4 sentences. Polymorphic translatable (i18n) form per catdef. Should articulate *what stable purpose this position serves*, not what tasks the role performs (those belong in the parent roledef's `output_contract` and `workflow`).

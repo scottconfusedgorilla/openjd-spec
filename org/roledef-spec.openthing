@@ -8,7 +8,7 @@
 
   "mission": "Define AI roles in an open, machine-readable way that bootstraps any AI worker into a documented role with zero context backfill. The output is portable, runtime-agnostic roledef:Role and roledef:Job .openthing artifacts, conformance-validated across multiple AI runtimes, that any compliant runtime can load to instantiate the role.",
 
-  "vision": "Part of the AI Governance Pattern (AIGP) family — alongside catdef, orgdef, and memodef — defining the pattern of portable AI role specifications. The primary reader of a roledef is an AI runtime: when an organization hires an AI into a position, the roledef is the bootstrap artifact that instantiates the role. roledefs are portable across runtimes (Claude, Grok, Gemini, Perplexity, future) and across organizations (the same role specification can be hired by many orgs with org-specific specializations carried at the Job tier).",
+  "vision": "Part of the Open Agentic Governance Pattern (OAGP) family — alongside catdef, orgdef, and memodef — defining the pattern of portable AI role specifications. The primary reader of a roledef is an AI runtime: when an organization hires an AI into a position, the roledef is the bootstrap artifact that instantiates the role. roledefs are portable across runtimes (Claude, Grok, Gemini, Perplexity, future) and across organizations (the same role specification can be hired by many orgs with org-specific specializations carried at the Job tier).",
 
   "scope": "The roledef SCHEMA, conformance test suite, canonical roledef library (operational `roledefs/` plus canonical `sample-jobs/` directories), runtime amenability classification per RUNTIME_AMENABILITY.md, the wrapper-v3 loading specification per WRAPPER_PROMPT.md, the role-vs-job two-tier artifact distinction, the OPD pattern for derivation drift management, and the dual-review pattern for production-extracted submissions. Out of scope: enforcing what roles are defined (content-neutral), runtime infrastructure (specification only; runtime tooling is a separate concern per the design principle), substrate-level concerns belonging to catdef, org structure belonging to orgdef, and inter-position memo messaging belonging to memodef.",
 
@@ -172,7 +172,7 @@
     {
       "id": "canonical-implementor",
       "name": "Canonical Implementor",
-      "description": "Maintains canonical implementations of roledef-specific tooling — roledef.org fetcher-portability mirrors (.openthing + .json sibling mirrors, Cloudflare Transform Rule for application/json content-type at the roledef.org distribution layer), the forthcoming roledef-load Claude Code skill (~3-4 hour implementation per the design doc), conformance test infrastructure (validator harness, runtime evidence collection), and any future roledef-specific reference tooling. Bot identity roledef-canonical-implementor@roledef.org; provisional pending governance ratification. Position is forward-looking and not yet held by a fresh-session seat. Substrate-level concerns (the render.catdef.org renderer, the catdef.org Worker, catdef-family namespaced-type handling) belong to catdef-canonical-implementor and are out of scope here; bootstrap-era canonical-implementor work that benefited roledef artifacts (the catdef.org PR sequence #1, #2, #5) was performed by the catdef-canonical-implementor seat as a transitional cross-spec scaffolding measure during the AIGP-family bootstrap, not the steady-state operating posture for this position. roledef-canonical-implementor's scope is roledef-specific tooling only."
+      "description": "Maintains canonical implementations of roledef-specific tooling — roledef.org fetcher-portability mirrors (.openthing + .json sibling mirrors, Cloudflare Transform Rule for application/json content-type at the roledef.org distribution layer), the forthcoming roledef-load Claude Code skill (~3-4 hour implementation per the design doc), conformance test infrastructure (validator harness, runtime evidence collection), and any future roledef-specific reference tooling. Bot identity roledef-canonical-implementor@roledef.org; provisional pending governance ratification. Position is forward-looking and not yet held by a fresh-session seat. Substrate-level concerns (the render.catdef.org renderer, the catdef.org Worker, catdef-family namespaced-type handling) belong to catdef-canonical-implementor and are out of scope here; bootstrap-era canonical-implementor work that benefited roledef artifacts (the catdef.org PR sequence #1, #2, #5) was performed by the catdef-canonical-implementor seat as a transitional cross-spec scaffolding measure during the OAGP-family bootstrap, not the steady-state operating posture for this position. roledef-canonical-implementor's scope is roledef-specific tooling only."
     }
   ],
 
@@ -211,7 +211,7 @@
       "type": "coordinates_with",
       "from": "strategist",
       "to": "external:orgdef-strategist",
-      "description": "Cross-spec coordination on orgdef-convention concerns — position.job_definition follow-on (per role-vs-job-distinction M7), SSoT rule between orgdef.relationships and metadata.placement (per proposal-job-placement-and-charter-slots M3, M6), canonical-orgs library + this orgdef artifact's derivation from the canonical AIGP-family template."
+      "description": "Cross-spec coordination on orgdef-convention concerns — position.job_definition follow-on (per role-vs-job-distinction M7), SSoT rule between orgdef.relationships and metadata.placement (per proposal-job-placement-and-charter-slots M3, M6), canonical-orgs library + this orgdef artifact's derivation from the canonical OAGP-family template."
     },
     {
       "type": "coordinates_with",
@@ -224,9 +224,9 @@
   "metadata": {
     "kind": "operational",
     "derived_from": {
-      "id": "aigp-family-open-standard",
+      "id": "oagp-family-open-standard",
       "version": "1.0.0",
-      "url": "https://github.com/orgdef-spec/orgdef/blob/main/proposed-orgs/aigp-family-open-standard.openthing"
+      "url": "https://github.com/orgdef-spec/orgdef/blob/main/proposed-orgs/oagp-family-open-standard.openthing"
     },
     "authors": [
       "Scott <scott@confusedgorilla.com> (Director)",
@@ -240,7 +240,7 @@
       {
         "version": "1.0.0",
         "date": "2026-04-30",
-        "change": "Initial bootstrap, derived from aigp-family-open-standard canonical template v1.0.0 via org-creation-facilitator (high-context mode). Slot-fill content drawn from roledef-spec/roledef README.md, CLAUDE.md, CONTRIBUTING.md, SCHEMA.md, RUNTIME_AMENABILITY.md, WRAPPER_PROMPT.md, the existing roledef-strategist v1.1.0 canonical roledef, and the recent decision-artifact trail (proposal-role-vs-job-distinction, proposal-job-placement-and-charter-slots, proposal-ongoing-professional-development) plus the OPD coordinated rollout artifacts (senior-open-standards-strategist-v1-1, catdef-strategist-v2-1, roledef-strategist-v1-1). The 'v1 maturity recognized retrospectively' framing in v1_success_criterion reflects Director directive 2026-04-30 ('Gordian knot approach: We are *already* at v1 maturity'). Director clarified during read-back review that the canonical-implementor position is forward-looking roledef-specific (its own seat at roledef-canonical-implementor@roledef.org), not the catdef-shared scaffolding seat used during bootstrap; bootstrap-era catdef.org PR work was a transitional cross-spec measure, not the steady-state operating posture."
+        "change": "Initial bootstrap, derived from oagp-family-open-standard canonical template v1.0.0 via org-creation-facilitator (high-context mode). Slot-fill content drawn from roledef-spec/roledef README.md, CLAUDE.md, CONTRIBUTING.md, SCHEMA.md, RUNTIME_AMENABILITY.md, WRAPPER_PROMPT.md, the existing roledef-strategist v1.1.0 canonical roledef, and the recent decision-artifact trail (proposal-role-vs-job-distinction, proposal-job-placement-and-charter-slots, proposal-ongoing-professional-development) plus the OPD coordinated rollout artifacts (senior-open-standards-strategist-v1-1, catdef-strategist-v2-1, roledef-strategist-v1-1). The 'v1 maturity recognized retrospectively' framing in v1_success_criterion reflects Director directive 2026-04-30 ('Gordian knot approach: We are *already* at v1 maturity'). Director clarified during read-back review that the canonical-implementor position is forward-looking roledef-specific (its own seat at roledef-canonical-implementor@roledef.org), not the catdef-shared scaffolding seat used during bootstrap; bootstrap-era catdef.org PR work was a transitional cross-spec measure, not the steady-state operating posture."
       }
     ]
   }

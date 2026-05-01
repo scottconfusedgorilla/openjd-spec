@@ -228,11 +228,11 @@ The committer is always the human steward. AI sessions never have merge authorit
 - **Submission questions** — open a Draft PR, ask in the description
 - **Spec questions** — open an issue tagged `spec-question`
 - **Governance questions** — open an issue tagged `governance` or contact the maintainers directly
-- **Adjacent project coordination** (catdef, openmemo, openorg, aigp.online) — issues tagged `cross-spec`
+- **Adjacent project coordination** (catdef, openmemo, openorg, oagp.online) — issues tagged `cross-spec`
 
 ## Contact
 
-File issues and PRs on this repository. For broader AIGP-pattern discussion, see [aigp.online](https://aigp.online).
+File issues and PRs on this repository. For broader OAGP-pattern discussion, see [oagp.online](https://oagp.online).
 
 ---
 

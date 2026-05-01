@@ -364,7 +364,7 @@ One-sentence summary of the role. Used in catalog indexes, search results, and q
 A single statement of the **stable slot of responsibility** this Job fills. Distinguishes one Job from another when both derive from the same parent Role.
 
 ```json
-"charter": "Holds delegated authority for orgdef-spec design decisions: library curation, scope narrowing, pattern promotion, MUST/SHOULD calls, and architectural deliberation. The stable slot of responsibility is 'orgdef as a credible open standard within the AIGP family.'"
+"charter": "Holds delegated authority for orgdef-spec design decisions: library curation, scope narrowing, pattern promotion, MUST/SHOULD calls, and architectural deliberation. The stable slot of responsibility is 'orgdef as a credible open standard within the OAGP family.'"
 ```
 
 Format guidance: prose, 1–4 sentences. Polymorphic translatable form per catdef. Should articulate *what stable purpose this Job serves*, not what tasks the role-holder performs (those belong in the parent Role's `output_contract` and `workflow`).
@@ -739,7 +739,7 @@ Richer extensions MAY include additional metadata to help unfamiliar agents act 
 }
 ```
 
-**Why this matters:** the AIGP architecture assumes catdef artifacts move between runtimes that may not share prior context. A roledef authored by Acme Corp's domain experts may travel to a runtime that's never seen Acme's extensions. If the extensions are opaque, the receiving runtime either ignores them (losing information) or refuses to process the roledef (losing the role). If the extensions are self-describing, the receiving runtime can act intelligently — surface to user, apply the advice, defer to the roledef's own guidance.
+**Why this matters:** the OAGP architecture assumes catdef artifacts move between runtimes that may not share prior context. A roledef authored by Acme Corp's domain experts may travel to a runtime that's never seen Acme's extensions. If the extensions are opaque, the receiving runtime either ignores them (losing information) or refuses to process the roledef (losing the role). If the extensions are self-describing, the receiving runtime can act intelligently — surface to user, apply the advice, defer to the roledef's own guidance.
 
 This is the roledef realization of catdef's broader self-describing-extensions principle: every extension carries enough metadata that a downstream agent without prior knowledge can do "something smart."
 
@@ -852,9 +852,9 @@ These belong to v0.3+ and will be triaged as roledef matures.
 
 ---
 
-## Conformance to AIGP principles
+## Conformance to OAGP principles
 
-This schema embodies the AIGP pattern's three corners:
+This schema embodies the OAGP pattern's three corners:
 
 - **Open**: schema is MIT-licensed, openly published, freely forkable
 - **Org chart**: each roledef captures a role with bounded scope, defined inputs/outputs, explicit authority limits (via guardrails), and clear collaboration edges (via metadata.related)

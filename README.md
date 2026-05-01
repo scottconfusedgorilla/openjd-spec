@@ -367,14 +367,14 @@ The roledef library is curated. Not every well-formed roledef will be merged int
 
 ## Related projects
 
-roledef is one corner of the **AIGP** (AI Governance Pattern) family. The full stack:
+roledef is one corner of the **OAGP** (Open Agentic Governance Pattern) family. The full stack:
 
 - **[catdef](https://catdef.org)** — the format substrate. roledefs are catdef artifacts.
 - **[openmemo](https://openmemo.dev)** — the communication protocol. roledef-instantiated employees talk to each other via openmemo.
 - **[openorg](https://openorg.dev)** — the organizational pattern catalog. Each `.openorg` composes roledefs into a complete org.
-- **[aigp.online](https://aigp.online)** — the meta-pattern documentation. The "why" behind the "what."
+- **[oagp.online](https://oagp.online)** — the meta-pattern documentation. The "why" behind the "what."
 
-You can use roledef alone (standalone roledefs for individual AI roles) or as part of the full AIGP stack (federations of roledef-instantiated employees coordinating via openmemo under openorg governance).
+You can use roledef alone (standalone roledefs for individual AI roles) or as part of the full OAGP stack (federations of roledef-instantiated employees coordinating via openmemo under openorg governance).
 
 ### Coexistence with adjacent specifications
 
@@ -418,7 +418,7 @@ roledef extracts patterns from years of practical AI-role design — Scott Welch
 
 The roledef methodology was sharpened by empirical conformance testing across multiple runtimes. Particular acknowledgment to **Perplexity**, which during the 2026-04-26 testing session falsified five distribution-layer hypotheses in succession and articulated the canonical design principle ("model tools can only touch a very small, whitelisted slice of the public web") more crisply than the strategist had — a satisfying recursive moment for a methodology designed to be empirically grounded.
 
-The roledef schema is informed by the AIGP design pattern. If you adopt roledef, you are practicing AI Governance Pattern at the role level. See [aigp.online](https://aigp.online) for the broader context.
+The roledef schema is informed by the OAGP design pattern. If you adopt roledef, you are practicing Open Agentic Governance Pattern at the role level. See [oagp.online](https://oagp.online) for the broader context.
 
 ---
 
