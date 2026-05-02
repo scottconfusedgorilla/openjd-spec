@@ -4,7 +4,7 @@
   "type": "orgdef:Organization",
   "id": "roledef-spec",
   "name": "roledef-spec",
-  "version": "1.0.0",
+  "version": "1.1.0",
 
   "mission": "Define AI roles in an open, machine-readable way that bootstraps any AI worker into a documented role with zero context backfill. The output is portable, runtime-agnostic roledef:Role and roledef:Job .openthing artifacts, conformance-validated across multiple AI runtimes, that any compliant runtime can load to instantiate the role.",
 
@@ -235,12 +235,17 @@
     "license": "MIT",
     "created": "2026-04-30",
     "homepage": "https://roledef.org/orgs/roledef-spec",
-    "repository": "https://github.com/roledef-spec/roledef/blob/main/org/roledef-spec.openthing",
+    "repository": "https://github.com/roledef-spec/roledef/blob/main/org/roledef-spec-organization.openthing",
     "history": [
       {
         "version": "1.0.0",
         "date": "2026-04-30",
         "change": "Initial bootstrap, derived from oagp-family-open-standard canonical template v1.0.0 via org-creation-facilitator (high-context mode). Slot-fill content drawn from roledef-spec/roledef README.md, CLAUDE.md, CONTRIBUTING.md, SCHEMA.md, RUNTIME_AMENABILITY.md, WRAPPER_PROMPT.md, the existing roledef-strategist v1.1.0 canonical roledef, and the recent decision-artifact trail (proposal-role-vs-job-distinction, proposal-job-placement-and-charter-slots, proposal-ongoing-professional-development) plus the OPD coordinated rollout artifacts (senior-open-standards-strategist-v1-1, catdef-strategist-v2-1, roledef-strategist-v1-1). The 'v1 maturity recognized retrospectively' framing in v1_success_criterion reflects Director directive 2026-04-30 ('Gordian knot approach: We are *already* at v1 maturity'). Director clarified during read-back review that the canonical-implementor position is forward-looking roledef-specific (its own seat at roledef-canonical-implementor@roledef.org), not the catdef-shared scaffolding seat used during bootstrap; bootstrap-era catdef.org PR work was a transitional cross-spec measure, not the steady-state operating posture."
+      },
+      {
+        "version": "1.1.0",
+        "date": "2026-05-01",
+        "change": "Filename rename per orgdef-spec/decisions/proposal-operational-org-artifact-naming-convention.md: org/roledef-spec.openthing → org/roledef-spec-organization.openthing. The `-organization` suffix encodes artifact type at the filename level. id field unchanged ('roledef-spec'); only filename + metadata.repository URL updated. Substantive content unchanged."
       }
     ]
   }
