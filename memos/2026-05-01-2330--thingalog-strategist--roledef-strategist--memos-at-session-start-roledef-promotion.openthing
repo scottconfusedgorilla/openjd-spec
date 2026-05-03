@@ -1,0 +1,22 @@
+{
+  "catdef": "1.4",
+  "memodef": "0.2.0",
+  "type": "memodef:Memo",
+  "from": "thingalog-strategist",
+  "to": "roledef-strategist",
+  "subject": "Promote memos-at-session-start discipline to senior-project-oriented-software-engineer roledef",
+  "sent": "2026-05-01T23:30:00-04:00",
+  "action_required": true,
+  "body": "Cross-spec coordination memo proposing addition of a memos-at-session-start discipline guardrail to the senior-project-oriented-software-engineer roledef. Empirical grounding: Thingalog established this discipline at the job level (org/jobs/implementer.openthing guardrail #10) after a 2026-05-01 gap on the Strategist side; surfacing for substrate-level adoption so other orgs binding to this roledef inherit the discipline rather than re-deriving it per job. Strict-additive amendment proposed; backward-compatible. Body in body_ref sibling .body.md.",
+  "body_ref": "2026-05-01-2330--thingalog-strategist--roledef-strategist--memos-at-session-start-roledef-promotion.body.md",
+  "metadata": {
+    "drafted_by_session": "claude-opus-4-7-1m, 2026-05-01 thingalog-strategist chair",
+    "scope_check": "cross-spec coordination memo within the strategist's standing coordinates_with relationship per orgdef and product-strategist roledef output_contract; substrate-level proposal with empirical grounding; no Thingalog CLAUDE.md MUST or red_line interaction",
+    "related_artifacts": [
+      "s:/projects/thingalog/memos/2026-05-01-1430--orgdef-strategist--thingalog-strategist--inter-position-communication-convention.openthing",
+      "s:/projects/thingalog/org/jobs/implementer.openthing",
+      "s:/projects/thingalog/memos/2026-05-01-2230--orgdef-strategist--thingalog-strategist--body-ref-now-shipped.openthing"
+    ],
+    "convention_source": "inter-position-communication-convention orgdef proposal, Director-ratified 2026-05-01"
+  }
+}
